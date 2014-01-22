@@ -1,0 +1,33 @@
+#!/usr/bin/python
+import sqlite3 as sqlite
+import os
+import sys
+import commands
+
+def maintenance():
+    DATABASE = raw_input("If you would like to erase an existing DB, type its name: ")
+
+    if DATABASE:
+        rmstring = "rm " + DATABASE
+        try:
+            os.system(rmstring)
+        except:
+            pass
+
+    DATABASE = raw_input("Type the name of the new DB to init: ")
+
+    connection = sqlite.connect(DATABASE)
+    cursor = connection.cursor()
+
+    cursor.execute('CREATE TABLE occurrences (oid INTEGER PRIMARY KEY, page INTEGER, nid INTEGER, eid INTEGER)')
+    cursor.execute('CREATE TABLE entries (eid INTEGER PRIMARY KEY, name TEXT)')
+    cursor.execute('CREATE TABLE notebooks (nid INTEGER PRIMARY KEY, ntype TEXT, nnum INTEGER, dopened DATE, dclosed DATE, events TEXT)')
+
+# MAIN #
+print "InformDB Maintenance"
+
+import getpass
+pw = getpass.getpass("Maintenance password: ")
+
+if pw == 'Mauddie':
+    maintenance()

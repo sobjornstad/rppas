@@ -19,7 +19,7 @@ def maintenance():
     connection = sqlite.connect(DATABASE)
     cursor = connection.cursor()
 
-    cursor.execute('CREATE TABLE occurrences (oid INTEGER PRIMARY KEY, page INTEGER, nid INTEGER, eid INTEGER)')
+    cursor.execute('CREATE TABLE occurrences (oid INTEGER PRIMARY KEY, page TEXT, nid INTEGER, eid INTEGER)') #page must be text to support 'see's and such
     cursor.execute('CREATE TABLE entries (eid INTEGER PRIMARY KEY, name TEXT)')
     cursor.execute('CREATE TABLE notebooks (nid INTEGER PRIMARY KEY, ntype TEXT, nnum INTEGER, dopened DATE, dclosed DATE, events TEXT)')
 

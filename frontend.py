@@ -53,7 +53,7 @@ def print_index():
 
         print "%s:" % name.upper(),
         for i in matches:
-            print "%s%i.%i" % (i[1][0], i[1][1], i[1][2]),
+            print "%s%i.%s" % (i[1][0], i[1][1], i[1][2]),
         print ""
 
 def adder():
@@ -70,6 +70,16 @@ def adder():
 def export_index():
     filename = raw_input("Filename? ")
     exporter.export_index(filename)
+
+def add_notebook():
+    #TODO: Error checking
+    #TODO: Better events editing
+    ntype = raw_input("Type? ")
+    nnum = int(raw_input("Number? "))
+    opend = raw_input("Open date? ")
+    closed = raw_input("Close date? ")
+    events = raw_input("Events? ")
+    backend.create_notebook(ntype, nnum, opend, closed, events)
 
 def main_menu():
     print "1) Print index"
@@ -90,7 +100,7 @@ def main_menu():
     elif choice == '4':
         adder()
     elif choice == '5':
-        create_notebook()
+        add_notebook()
     elif choice == '6':
         export_index()
     else:

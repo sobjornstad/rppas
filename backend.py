@@ -10,13 +10,13 @@ def cleanup():
     connection.commit()
     exit()
 
-def create_notebook(ntype, nnum):
+def create_notebook(ntype, nnum, opend, closed, events):
     cursor.execute('SELECT nid FROM notebooks WHERE ntype = ? AND nnum = ?', (ntype, nnum))
-    if cursor.fetchall:
+    if cursor.fetchall():
         print "Notebook %s%i already exists!" % (ntype, nnum)
         return
 
-    cursor.execute('INSERT INTO notebooks VALUES (null, ?, ?, ?, ?, ?)', (ntype, nnum, "2013-01-01", "2013-01-05", "foobar"))
+    cursor.execute('INSERT INTO notebooks VALUES (null, ?, ?, ?, ?, ?)', (ntype, nnum, opend, closed, events))
 
 def get_entry_eid(entry):
     cursor.execute('SELECT eid FROM entries WHERE name = ?;', (entry,))
@@ -69,6 +69,8 @@ def fetch_occurrences(eid):
         match_num += 1
 
     # sort in order placed: by type, notebook num, page num
+    # unfortunately, does alphabetical sort on numbers in pagenums, as that field
+    # must be a string for other reasons
     matches_sorted = sorted(matches.iteritems(), key=operator.itemgetter(1))
     return matches_sorted
 

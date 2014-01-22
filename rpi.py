@@ -69,28 +69,64 @@ def fetch_occurrences(eid):
     return matches_sorted
 
 
-def search_entry(search):
+def lookup(search):
     #TODO: What if nothing found
-    #TODO: Sort search results by chronology
     #TODO: Consider different formatting possibilities
 
     # find EID of entry to search for, find all occurrences that reference it
     eid = get_entry_eid(search)
     if not eid:
-        print "%s: No results." % search.upper()
         return
 
     matches = fetch_occurrences(eid)
+    return matches
 
+def display_results(search, results):
     print "%s:" % search.upper(),
-    for i in matches:
+    for i in results:
         print "%s%i.%i" % (i[1][0], i[1][1], i[1][2]),
     print ""
 
-    return
+def lookup_frontend():
+    search = raw_input("> ")
+    matches = lookup(search)
 
-def inexact_search(search):
+    if not matches:
+        print "%s: No results." % search.upper()
+        return
+    display_results(search, matches)
+
+def search_frontend():
+    search = raw_input("> ")
     print "Searching for %s..." % search.upper(),
+    results, matches = search_entries(search)
+
+    if not results:
+        print "no results."
+        return
+    else:
+        print results
+
+    for match in matches:
+        print "%i: %s" % (match, matches[match][0].upper())
+
+    entry = raw_input("Entry to look up or 0 to cancel: ")
+    try:
+        entry = int(entry)
+    except ValueError:
+        print "Invalid number."
+        return
+    else:
+        if entry == 0:
+            return
+        try:
+            results = lookup(matches[entry][0])
+            display_results(matches[entry][0], results)
+        except KeyError:
+            print "Invalid selection."
+            return
+
+def search_entries(search):
     search = "*" + search + "*"
     cursor.execute('SELECT name FROM entries WHERE name GLOB ? ORDER BY name', (search,))
 
@@ -101,31 +137,17 @@ def inexact_search(search):
         matchnum += 1
 
     if not matches:
-        print "\bno results."
-        return
+        return None, None
     else:
-        print "\b%i results." % len(matches)
-        for match in matches:
-            print "%i: %s" % (match, matches[match][0].upper())
+        results = "\b%i results." % len(matches)
+        return results, matches
 
-        entry = raw_input("Entry to look up or 0 to cancel: ")
-        try:
-            entry = int(entry)
-        except ValueError:
-            print "Invalid number."
-            return
-        else:
-            if entry == 0:
-                return
-            try:
-                search_entry(matches[entry][0])
-            except KeyError:
-                print "Invalid selection."
-                return
+def dump_index():
+    cursor.execute('SELECT eid, name FROM entries ORDER BY name')
+    return cursor.fetchall()
 
 def print_index():
-    cursor.execute('SELECT eid, name FROM entries ORDER BY name')
-    for entry in cursor.fetchall(): # use fetchall, fetch_occurrences steals the cursor
+    for entry in dump_index():
         eid, name = entry
         matches = fetch_occurrences(eid)
 
@@ -157,9 +179,9 @@ def menu():
     if choice == '1':
         print_index()
     elif choice == '2':
-        inexact_search()
+        search_frontend()
     elif choice == '3':
-        search_entry()
+        lookup_frontend()
     elif choice == '4':
         adder()
     elif choice == '5':
@@ -176,8 +198,8 @@ connect_db()
 menu()
 
 #print_index()
-#inexact_search("Maud")
-#search_entry("Bethamer, Maud")
+#search("Maud")
+#lookup("Bethamer, Maud")
 #adder()
 
 exit()
@@ -191,6 +213,6 @@ add_entry("Bethamer, Maud", "CB", 4, 80)
 add_entry("Bethamer, Maud", "TB", 1, 220)
 add_entry("Bjornstad, Soren", "CB", 2, 50)
 add_entry("Bjornstad, Jennifer", "CB", 2, 50)
-search_entry("Bethamer, Maud")
-search_entry("Bjornstad, Soren")
-search_entry("The Great Mouse")
+lookup("Bethamer, Maud")
+lookup("Bjornstad, Soren")
+lookup("The Great Mouse")

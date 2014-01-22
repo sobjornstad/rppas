@@ -1,10 +1,11 @@
 import backend
 import exporter
+import importer
 
 def display_results(search, results):
     print "%s:" % search.upper(),
     for i in results:
-        print "%s%i.%i" % (i[1][0], i[1][1], i[1][2]),
+        print "%s%i.%s" % (i[1][0], i[1][1], i[1][2]),
     print ""
 
 def lookup_frontend():
@@ -66,6 +67,7 @@ def adder():
         if entry == '': break
         page = int( raw_input("Page: ") )
         backend.add_entry(entry, ntype, nnum, page)
+        backend.run_commit()
 
 def export_index():
     filename = raw_input("Filename? ")
@@ -81,6 +83,10 @@ def add_notebook():
     events = raw_input("Events? ")
     backend.create_notebook(ntype, nnum, opend, closed, events)
 
+def import_csv():
+    filename = raw_input("Filename? ")
+    importer.import_from_base(filename)
+
 def main_menu():
     print "1) Print index"
     print "2) Search index"
@@ -88,6 +94,7 @@ def main_menu():
     print "4) Add to index"
     print "5) Add notebook"
     print "6) Export index to text"
+    print "7) Import index from text"
     print "0) Quit"
     choice = raw_input("> ")
 
@@ -103,6 +110,8 @@ def main_menu():
         add_notebook()
     elif choice == '6':
         export_index()
+    elif choice == '7':
+        importer.import_from_base('input.txt')
     else:
         backend.cleanup()
 

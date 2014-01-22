@@ -4,11 +4,15 @@ import operator
 def initialize():
     global connection, cursor
     connection = sqlite.connect("records.db")
+    connection.text_factory = str # fix for some weird Unicode error
     cursor = connection.cursor()
 
 def cleanup():
     connection.commit()
     exit()
+
+def run_commit():
+    connection.commit()
 
 def create_notebook(ntype, nnum, opend, closed, events):
     cursor.execute('SELECT nid FROM notebooks WHERE ntype = ? AND nnum = ?', (ntype, nnum))
@@ -46,8 +50,6 @@ def add_entry(entry, ntype, nnum, pagenum):
         cursor.execute('INSERT INTO occurrences VALUES (null, ?, ?, ?)', (pagenum, nid, eid))
     else:
         print "Occurrence %s already exists." % entry.upper()
-
-    connection.commit() # consider running this only so often, as it does cause a perceptible delay
 
 def fetch_occurrences(eid):
     # Given an EID, get occurrences that match it.
@@ -88,9 +90,12 @@ def lookup(search):
     return matches
 
 def search_entries(search):
-    search = "*" + search + "*"
-    cursor.execute('SELECT name FROM entries WHERE name GLOB ? ORDER BY name', (search,))
+    search = "%" + search + "%"
+    cursor.execute('SELECT name FROM entries \
+                    WHERE name LIKE ? \
+                    ORDER BY name', (search,))
 
+                    #COLLATE NOCASE \
     matches = {}
     matchnum = 1
     for match in cursor.fetchall():

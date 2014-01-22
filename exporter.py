@@ -14,7 +14,7 @@ def export_index(filename):
                 writeString += ","
             else:
                 comma = True
-            writeString += "%s%i.%i" % (i[1][0], i[1][1], i[1][2])
+            writeString += "%s%i.%s" % (i[1][0], i[1][1], i[1][2])
         writeString += "\n"
 
     f = open(filename, 'w')

@@ -83,6 +83,13 @@ def add_notebook():
     events = raw_input("Events? ")
     backend.create_notebook(ntype, nnum, opend, closed, events)
 
+def list_notebooks():
+    nlist = backend.dump_notebooks()
+    print nlist
+    print "Book\tOpen Date\tClose Date"
+    for i in nlist:
+        print "%s%i\t%s\t%s" % (i[0], i[1], i[2], i[3])
+
 def import_csv():
     filename = raw_input("Filename? ")
     importer.import_from_base(filename)
@@ -116,3 +123,5 @@ def main_menu():
         backend.cleanup()
 
     main_menu()
+
+list_notebooks()

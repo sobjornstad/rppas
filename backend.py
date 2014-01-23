@@ -41,6 +41,20 @@ def dump_notebooks():
                     ORDER BY ntype, nnum') # or order by date once we have it
     return cursor.fetchall()
 
+def dump_dated_notebooks(dopened, dclosed):
+    """Like dump_notebooks, but requests only notebooks between two dates."""
+    cursor.execute('SELECT ntype, nnum, dopened, dclosed, events FROM notebooks \
+                    WHERE dopened > ? AND dclosed < ? \
+                    ORDER BY ntype, nnum', (dopened, dclosed)) #once again, or order by dates
+    return cursor.fetchall()
+
+def dump_open_notebooks(dat):
+    """Like dump_notebooks, but requests only notebooks open at a specific date."""
+    cursor.execute('SELECT ntype, nnum, dopened, dclosed, events FROM notebooks \
+                    WHERE dopened < ? AND dclosed > ? \
+                    ORDER BY ntype, nnum', (dat, dat)) #once again, or order by dates
+    return cursor.fetchall()
+
 def get_notebook_info(nid, columns):
     """
     Get information about a notebook from its nid.

@@ -29,7 +29,7 @@ def lookup_by_number(results):
         # maybe they typed the word instead; if not, they'll be told no matches
         lookup_action(index)
     else:
-        # lookup by word
+        # lookup by number
         lookup_action(results[index][0])
 
 def lookup_action(search):
@@ -85,8 +85,8 @@ def search_screen():
     else:
         print "No results."
 
-    keys = ['L', 'S', 'Q']
-    commands = {'L':'Lookup', 'S': 'Search again', 'Q':'Quit'}
+    keys = ['L', 'S', 'W', 'Q']
+    commands = {'L':'Lookup', 'S':'Search again', 'W':'When was', 'Q':'Quit'}
     print_commands(keys, commands, '')
     termdisplay.entry_square()
 
@@ -99,6 +99,8 @@ def search_screen():
             r = search_screen()
             if r == 'break':
                 return 'break' # see below comment on 'q'
+        elif c == 'w':
+            when_was()
         elif c == 'q':
             # even if we run search several times, we only want to press q once
             return 'break'
@@ -110,24 +112,43 @@ def search_screen():
             print '\b!\b',
             continue
 
-def notebook_list_actions():
-    pass
-
 def list_notebooks():
+    # start with no filters
+    dopened = None
+    dclosed = None
+    dat = None
+    filtered = None
+
     while True:
         print_title()
+        if filtered == 'filterRange':
+            print "Showing notebooks opened after %s and closed before %s." \
+                    % (dopened, dclosed)
+        elif filtered == 'openAt':
+            print "Showing notebooks open on %s." \
+                    % (dat)
+
         formatStr = termdisplay.colors.GREEN + "%s\t" + \
                     termdisplay.colors.BLUE + "%s\t" + \
                     termdisplay.colors.RED + "%s" + \
                     termdisplay.colors.ENDC
         print formatStr % ("Book", "Open Date", "Close Date")
 
-        nlist = backend.dump_notebooks()
+        # filters?
+        if filtered == 'filterRange':
+            nlist = backend.dump_dated_notebooks(dopened, dclosed)
+        elif filtered == 'openAt':
+            nlist = backend.dump_open_notebooks(dat)
+        else:
+            nlist = backend.dump_notebooks()
+
+        if not nlist:
+            print "(no results)"
         for i in nlist:
             print formatStr % ((i[0] + str(i[1])), i[2], i[3])
 
-        keys = ['E', 'S', 'V', 'Q']
-        commands = {'E':'Edit', 'S': 'Subset', 'V': 'Events', 'Q':'Quit'}
+        keys = ['E', 'F', 'O', 'C', 'V', 'Q']
+        commands = {'E':'Edit', 'F': 'Filter', 'O':'Open at time', 'C': 'Clear filter', 'V': 'Events', 'Q':'Quit'}
         print_commands(keys, commands, '')
         termdisplay.entry_square()
 
@@ -137,11 +158,24 @@ def list_notebooks():
             r = edit_notebook()
             if r == 'break':
                 return 'break' # see below comment on 'q'
+        elif c == 'f':
+            print ""
+            dopened = termdisplay.ask_input("Opened after:")
+            print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
+            dclosed = termdisplay.ask_input("Closed before:")
+            filtered = 'filterRange'
+        elif c == 'o':
+            print ""
+            dat = termdisplay.ask_input("Open at:")
+            filtered = 'openAt'
+        elif c == 'c':
+            dopened, dclosed, dat, filtered = None, None, None, None
         elif c == 'q':
             return 'break'
 
 def edit_notebook():
     ntype = termdisplay.ask_input("Type to edit:")
+    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
     nnum = termdisplay.ask_input("Number to edit:")
 
     nid = backend.get_nid(ntype, nnum)
@@ -149,9 +183,12 @@ def edit_notebook():
         print "Error -- no matches."
         termdisplay.entry_square()
         getch()
+        return
 
     dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")
+    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
     nopen = termdisplay.ask_input("Open date [%s]:" % dopened)
+    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
     nclose = termdisplay.ask_input("Close date [%s]:" % dclosed)
     # we're leaving out dealing with events
     # also, validation would be a good thing
@@ -180,6 +217,18 @@ def notebooks_screen():
             break
         else:
             continue
+
+def when_was():
+    print ""
+    ntype = termdisplay.ask_input("When was type:")
+    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
+    nnum  = termdisplay.ask_input("          num:")
+    nid = backend.get_nid(ntype, nnum)
+    #also add events
+    dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")
+
+    print "That happened between %s and %s." % (dopened, dclosed)
+    termdisplay.entry_square()
 
 def main_screen():
     keys = ['S', 'P', 'E', 'N', 'I', 'X', 'Q']

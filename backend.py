@@ -316,31 +316,5 @@ def dump_index():
 initialize()
 
 if __name__ == "__main__":
+    # testing area; not run in normal operation
     print fetch_occurrences(6)
-    # run any function you'd like, to test it
-    #print dump_notebooks()
-    #print occurrences_around('CB', 6, 12)
-    #print get_notebook_info(2, "ntype, nid, dopened, events, dclosed, nnum")
-    #rewrite_notebook_dates(2, "2013-04-01", "2013-05-04")
-
-### old tests ###
-
-#print_index()
-#search("Maud")
-#lookup("Bethamer, Maud")
-#adder()
-
-#exit()
-#create_notebook("CB", 2)
-#create_notebook("TB", 1)
-#create_notebook("CB", 4)
-#add_entry("Bethamer, Maud", "CB", 2, 24)
-#add_entry("Bethamer, Maud", "CB", 2, 14)
-#add_entry("Bethamer, Maud", "CB", 4, 14)
-#add_entry("Bethamer, Maud", "CB", 4, 80)
-#add_entry("Bethamer, Maud", "TB", 1, 220)
-#add_entry("Bjornstad, Soren", "CB", 2, 50)
-#add_entry("Bjornstad, Jennifer", "CB", 2, 50)
-#lookup("Bethamer, Maud")
-#lookup("Bjornstad, Soren")
-#lookup("The Great Mouse")

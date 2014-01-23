@@ -1,0 +1,22 @@
+- nearby() catches things that are "nearby" in fewer digits: e.g., 6: 59-61.
+  We can partially fix this by using leading zeroes on single-digit values;
+  for the low tens of the TBs, it's still a problem. The latter is not a high
+  priority but would obviously be better fixed.
+
+- occurrences_around() uses a pointless dictionary.
+
+- add_entry() doesn't do any validation on if the notebook exists.
+  Also, it should try to enforce leading zero page numbers.
+
+- Notebooks filter seems to break if we don't use leading zeroes in dates -- I
+  think it's using a string comparison, which works fine when the YYYY-MM-DD is
+  done properly. Enforce proper date format.
+
+
+FEATURE REQUESTS
+  (from self)
+----------------
+
+- search_entries() - this is also a frontend thing - Allow a "starts with"
+  search, like the STO directory, for things like "UI" and "IT" that are often
+  substrings. Maybe a case-sensitive option too?

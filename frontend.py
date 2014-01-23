@@ -8,6 +8,15 @@ def print_title():
     print termdisplay.horizontalRule() + termdisplay.colors.ENDC
     print ""
 
+def print_commands(keys, commands, title):
+    print termdisplay.center(termdisplay.colors.GREEN + title + termdisplay.colors.ENDC)
+    displayString = ''
+    for i in keys:
+        displayString += termdisplay.colors.BLUE + '<' + i + '> ' + \
+              termdisplay.colors.ENDC + commands[i] + '\n'
+
+    print termdisplay.text_box(displayString.rstrip())
+
 def lookup_by_number(results):
     """
     Called after a search to ask for input and look up an item by number.
@@ -101,14 +110,76 @@ def search_screen():
             print '\b!\b',
             continue
 
-def print_commands(keys, commands, title):
-    print termdisplay.center(termdisplay.colors.GREEN + title + termdisplay.colors.ENDC)
-    displayString = ''
-    for i in keys:
-        displayString += termdisplay.colors.BLUE + '<' + i + '> ' + \
-              termdisplay.colors.ENDC + commands[i] + '\n'
+def notebook_list_actions():
+    pass
 
-    print termdisplay.text_box(displayString.rstrip())
+def list_notebooks():
+    while True:
+        print_title()
+        formatStr = termdisplay.colors.GREEN + "%s\t" + \
+                    termdisplay.colors.BLUE + "%s\t" + \
+                    termdisplay.colors.RED + "%s" + \
+                    termdisplay.colors.ENDC
+        print formatStr % ("Book", "Open Date", "Close Date")
+
+        nlist = backend.dump_notebooks()
+        for i in nlist:
+            print formatStr % ((i[0] + str(i[1])), i[2], i[3])
+
+        keys = ['E', 'S', 'V', 'Q']
+        commands = {'E':'Edit', 'S': 'Subset', 'V': 'Events', 'Q':'Quit'}
+        print_commands(keys, commands, '')
+        termdisplay.entry_square()
+
+        c = getch()
+        if c == 'e':
+            print ""
+            r = edit_notebook()
+            if r == 'break':
+                return 'break' # see below comment on 'q'
+        elif c == 'q':
+            return 'break'
+
+def edit_notebook():
+    ntype = termdisplay.ask_input("Type to edit:")
+    nnum = termdisplay.ask_input("Number to edit:")
+
+    nid = backend.get_nid(ntype, nnum)
+    if nid == 0:
+        print "Error -- no matches."
+        termdisplay.entry_square()
+        getch()
+
+    dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")
+    nopen = termdisplay.ask_input("Open date [%s]:" % dopened)
+    nclose = termdisplay.ask_input("Close date [%s]:" % dclosed)
+    # we're leaving out dealing with events
+    # also, validation would be a good thing
+
+    backend.rewrite_notebook_dates(nid, nopen, nclose)
+
+
+def notebooks_screen():
+    keys = ['L', 'A', 'Q']
+    commands = {'L':'List notebooks',
+                'A':'Add notebook',
+                'Q':'Quit',
+               }
+
+    while True:
+        print_title()
+        print_commands(keys, commands, '  Notebooks')
+        termdisplay.entry_square()
+        c = getch()
+
+        if c == 'l':
+            list_notebooks()
+        elif c == 'a':
+            add_notebook()
+        elif c == 'q':
+            break
+        else:
+            continue
 
 def main_screen():
     keys = ['S', 'P', 'E', 'N', 'I', 'X', 'Q']
@@ -129,8 +200,10 @@ def main_screen():
 
         if c == 's':
             search_screen()
+        elif c == 'n':
+            notebooks_screen()
         elif c == 'q' or c == '\x03': # ctrl-c
-            exit()
+            backend.cleanup()
         else:
             continue
 

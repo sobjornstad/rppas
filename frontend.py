@@ -2,24 +2,15 @@ import termdisplay
 import backend
 from termdisplay import getch
 
-def print_title():
-    termdisplay.clearscreen()
-    print termdisplay.center(termdisplay.colors.WHITE + "  The Records Project Indexing Search Engine")
-    print termdisplay.horizontalRule() + termdisplay.colors.ENDC
-    print ""
-
-def print_commands(keys, commands, title):
-    print termdisplay.center(termdisplay.colors.GREEN + title + termdisplay.colors.ENDC)
-    displayString = ''
-    for i in keys:
-        displayString += termdisplay.colors.BLUE + '<' + i + '> ' + \
-              termdisplay.colors.ENDC + commands[i] + '\n'
-
-    print termdisplay.text_box(displayString.rstrip())
-
 def lookup_by_number(results):
     """
     Called after a search to ask for input and look up an item by number.
+    
+    This is separate from lookup_action because originally I had planned that
+    you could initiate a straight lookup from the main menu, which would need a
+    different by_number function but could use the same lookup_action function.
+    You can no longer do this, but in case of future changes that permit
+    lookups from different places, I'm leaving the functions divided.
     """
 
     index = termdisplay.ask_input("Lookup:")
@@ -34,7 +25,8 @@ def lookup_by_number(results):
 
 def lookup_action(search):
     """
-    Find the entry being looked up and print out its occurrences.
+    Find the entry being looked up (by lookup_by_number) and print out its
+    occurrences.
     """
 
     matches = backend.lookup(search)
@@ -75,8 +67,59 @@ def lookup_action(search):
     print ""
     termdisplay.entry_square()
 
+def nearby():
+    """
+    Option from the search screen that allows the user to find other index
+    entries used for an occurrence's page and nearby pages.
+
+    No arguments; all requisite information is input within the function.
+    """
+
+    print ""
+    ntype = termdisplay.ask_input("Nearby type:")
+    nnum  = termdisplay.ask_input("        num:", extended=True)
+    page  = termdisplay.ask_input("        page:", extended=True)
+
+    results = backend.occurrences_around(ntype, nnum, page)
+
+    formatStr = termdisplay.colors.GREEN + "%s%i" + \
+                termdisplay.colors.ENDC + '.' + \
+                termdisplay.colors.BLUE + "%s\t" + \
+                termdisplay.colors.WHITE + "%s" + \
+                termdisplay.colors.ENDC
+
+    for i in results:
+        print formatStr % (ntype, int(nnum), i[0], i[1])
+
+    termdisplay.entry_square()
+
+def when_was():
+    """
+    Option from the search screen to find the date a notebook was open, so that
+    you can tell roughly when a given occurrence was written (useful for CB,
+    probably not too much for other types).
+
+    No arguments; all requisite information is input within the function.
+    """
+
+    print ""
+    ntype = termdisplay.ask_input("When was type:")
+    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
+    nnum  = termdisplay.ask_input("          num:")
+    nid = backend.get_nid(ntype, nnum)
+    #also add events
+    dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")
+
+    print "That happened between %s and %s." % (dopened, dclosed)
+    termdisplay.entry_square()
+
 def search_screen():
-    print_title()
+    """
+    Screen that allows the user to search for index entries matching a query,
+    then optionally run a lookup, When was, or Nearby.
+    """
+
+    termdisplay.print_title()
     search = termdisplay.ask_input("Search:")
     results, matches = backend.search_entries(search)
     if matches:
@@ -86,8 +129,9 @@ def search_screen():
         print "No results."
 
     keys = ['L', 'S', 'N', 'W', 'Q']
-    commands = {'L':'Lookup', 'S':'Search again', 'N':'Nearby', 'W':'When was', 'Q':'Quit'}
-    print_commands(keys, commands, '')
+    commands = {'L':'Lookup', 'S':'Search again', 'N':'Nearby',
+                'W':'When was', 'Q':'Quit'}
+    termdisplay.print_commands(keys, commands, '')
     termdisplay.entry_square()
 
     while True:
@@ -114,29 +158,12 @@ def search_screen():
             print '\b!\b',
             continue
 
-def nearby():
-    print ""
-    ntype = termdisplay.ask_input("Nearby type:")
-    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
-    nnum  = termdisplay.ask_input("        num:")
-    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
-    page  = termdisplay.ask_input("        page:")
-
-    results = backend.occurrences_around(ntype, nnum, page)
-
-    formatStr = termdisplay.colors.GREEN + "%s%i" + \
-                termdisplay.colors.ENDC + '.' + \
-                termdisplay.colors.BLUE + "%s\t" + \
-                termdisplay.colors.WHITE + "%s" + \
-                termdisplay.colors.ENDC
-
-    for i in results:
-        print formatStr % (ntype, int(nnum), i[0], i[1])
-
-    termdisplay.entry_square()
-
-
 def list_notebooks():
+    """
+    Screen to display a list of notebooks, with or without filters. All
+    filtering and editing is done from within this screen.
+    """
+
     # start with no filters
     dopened = None
     dclosed = None
@@ -144,7 +171,7 @@ def list_notebooks():
     filtered = None
 
     while True:
-        print_title()
+        termdisplay.print_title()
         if filtered == 'filterRange':
             print "Showing notebooks opened after %s and closed before %s." \
                     % (dopened, dclosed)
@@ -172,8 +199,9 @@ def list_notebooks():
             print formatStr % ((i[0] + str(i[1])), i[2], i[3])
 
         keys = ['E', 'F', 'O', 'C', 'V', 'Q']
-        commands = {'E':'Edit', 'F': 'Filter', 'O':'Open at time', 'C': 'Clear filter', 'V': 'Events', 'Q':'Quit'}
-        print_commands(keys, commands, '')
+        commands = {'E':'Edit', 'F': 'Filter', 'O':'Open at time',
+                    'C': 'Clear filter', 'V': 'Events', 'Q':'Quit'}
+        termdisplay.print_commands(keys, commands, '')
         termdisplay.entry_square()
 
         c = getch()
@@ -185,8 +213,7 @@ def list_notebooks():
         elif c == 'f':
             print ""
             dopened = termdisplay.ask_input("Opened after:")
-            print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
-            dclosed = termdisplay.ask_input("Closed before:")
+            dclosed = termdisplay.ask_input("Closed before:", extended=True)
             filtered = 'filterRange'
         elif c == 'o':
             print ""
@@ -198,9 +225,16 @@ def list_notebooks():
             return 'break'
 
 def edit_notebook():
+    """
+    Edit the dates a notebook was open. Gets information within the function
+    and returns nothing.
+
+    Later, should also edit the events. We don't have code to handle events
+    anywhere yet.
+    """
+
     ntype = termdisplay.ask_input("Type to edit:")
-    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
-    nnum = termdisplay.ask_input("Number to edit:")
+    nnum = termdisplay.ask_input("Number to edit:", extended=True)
 
     nid = backend.get_nid(ntype, nnum)
     if nid == 0:
@@ -210,17 +244,17 @@ def edit_notebook():
         return
 
     dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")
-    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
-    nopen = termdisplay.ask_input("Open date [%s]:" % dopened)
-    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
-    nclose = termdisplay.ask_input("Close date [%s]:" % dclosed)
-    # we're leaving out dealing with events
-    # also, validation would be a good thing
+    nopen = termdisplay.ask_input("Open date [%s]:" % dopened, extended=True)
+    nclose = termdisplay.ask_input("Close date [%s]:" % dclosed, extended=True)
+    # validation of dates would be a good thing
 
     backend.rewrite_notebook_dates(nid, nopen, nclose)
 
-
 def notebooks_screen():
+    """
+    Screen to allow listing and adding notebooks. Maybe something else later?
+    """
+
     keys = ['L', 'A', 'Q']
     commands = {'L':'List notebooks',
                 'A':'Add notebook',
@@ -228,8 +262,8 @@ def notebooks_screen():
                }
 
     while True:
-        print_title()
-        print_commands(keys, commands, '  Notebooks')
+        termdisplay.print_title()
+        termdisplay.print_commands(keys, commands, '  Notebooks')
         termdisplay.entry_square()
         c = getch()
 
@@ -242,19 +276,12 @@ def notebooks_screen():
         else:
             continue
 
-def when_was():
-    print ""
-    ntype = termdisplay.ask_input("When was type:")
-    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
-    nnum  = termdisplay.ask_input("          num:")
-    nid = backend.get_nid(ntype, nnum)
-    #also add events
-    dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")
-
-    print "That happened between %s and %s." % (dopened, dclosed)
-    termdisplay.entry_square()
-
 def main_screen():
+    """
+    Screen to select other screens. If you're working on this and aren't
+    familiar with the concept of a main menu, get out.
+    """
+
     keys = ['S', 'P', 'E', 'N', 'I', 'X', 'Q']
     commands = {'S':'Search',
                 'P':'Print Index',
@@ -266,8 +293,8 @@ def main_screen():
                }
 
     while True:
-        print_title()
-        print_commands(keys, commands, '  Main')
+        termdisplay.print_title()
+        termdisplay.print_commands(keys, commands, '  Main')
         termdisplay.entry_square()
         c = getch()
 

@@ -2,7 +2,9 @@
 
 import os
 from pyparsing import *
-from config import SCREEN_WIDTH
+from config import SCREEN_WIDTH, TITLE
+
+### CONSTANTS AND CLASSES ###
 
 class colors:
     """
@@ -89,6 +91,10 @@ class _GetchWindows:
 
 # create getch object (to be imported by other modules)
 getch = _Getch()
+
+
+### STRING MODIFIERS ###
+# These don't print anything, but just return a styled/modified string.
 
 def stripAnsi(string):
     """
@@ -177,17 +183,6 @@ def horizontalRule(char='—'):
 
     return char * SCREEN_WIDTH
 
-def clearscreen():
-    """Clear the console screen."""
-
-    print "" # sometimes the display ends up off if you don't do this
-    if os.name == "posix":
-        os.system('clear')
-    elif os.name in ("nt", "dos", "ce"):
-        os.system('CLS')
-    else:
-        print '\n' * 100
-
 def text_box(text, centerBox=True, centerText=False):
     """
     Return the string for a box containing the provided string.
@@ -237,6 +232,21 @@ def text_box(text, centerBox=True, centerText=False):
 
     return boxString
 
+
+### PRINTERS ###
+# These directly modify the screen.
+
+def clearscreen():
+    """Clear the console screen."""
+
+    print "" # sometimes the display ends up off if you don't do this
+    if os.name == "posix":
+        os.system('clear')
+    elif os.name in ("nt", "dos", "ce"):
+        os.system('CLS')
+    else:
+        print '\n' * 100
+
 def entry_square():
     """
     Directly print a bracket-box to hold the cursor when waiting for
@@ -247,14 +257,40 @@ def entry_square():
     padding = ' ' * (SCREEN_WIDTH - 3)
     print padding + colors.GREEN + "[ ]" + colors.ENDC + "\b\b",
 
-def ask_input(prompt):
+def ask_input(prompt, extended=True):
     """
-    Ask for extended input with raw_input. Prints prompt (using appropriate
+    Ask for a line of input with raw_input. Prints prompt (using appropriate
     color), returns the user's input.
+
+    The optional extended parameter is used if there are several ask_inputs in
+    a row, in which case there is too large a gap between them normally.
+    Extended should be enabled on ones subsequent to the first to remove this
+    gap.
     """
+
+    if extended:
+        prompt = moveCodes.UP1 + prompt
 
     print colors.RED + prompt + colors.YELLOW,
     search = raw_input()
     print colors.ENDC
     return search
 
+def print_title():
+    """
+    Clear the screen and print config.TITLE and an HR to the top of the screen.
+    """
+
+    clearscreen()
+    print center(colors.WHITE + TITLE)
+    print horizontalRule() + colors.ENDC
+    print ""
+
+def print_commands(keys, commands, title):
+    print center(colors.GREEN + title + colors.ENDC)
+    displayString = ''
+    for i in keys:
+        displayString += colors.BLUE + '<' + i + '> ' + \
+              colors.ENDC + commands[i] + '\n'
+
+    print text_box(displayString.rstrip())

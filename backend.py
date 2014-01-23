@@ -28,10 +28,6 @@ def cleanup():
     connection.commit()
     exit()
 
-def run_commit():
-    # This is unnecessary; we should just run backend.connection.commit().
-    connection.commit()
-
 
 ### NOTEBOOK OPERATIONS ###
 

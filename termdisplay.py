@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
-from config import SCREEN_WIDTH
+
 import os
 from pyparsing import *
+from config import SCREEN_WIDTH
 
 class colors:
-    # http://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
+    """
+    A class storing ANSI escape codes for coloring text. All data are strings.
+    To use, do something like colors.RED + "red text" + colors.ENDC.
+
+    Source (this version somewhat modified):
+    http://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
+    """
+
     BLACK = '\033[40m'
     RED = '\033[31m'
     GREEN = '\033[32m'
@@ -16,20 +24,19 @@ class colors:
 
     ENDC = '\033[0m'
 
-    #OKBLUE = '\033[94m'
-    #OKGREEN = '\033[92m'
-    #WARNING = '\033[93m'
-    #FAIL = '\033[91m'
+class moveCodes:
+    """
+    A class storing ANSI escape codes for moving the cursor.
+    """
 
-    def disable(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
+    UP1 = "\033[1A"
 
 class lines:
+    """
+    A class storing Unicode line-drawing characters. All data are single-char
+    strings.
+    """
+
     ACROSS='═'
     DOWN  ='║'
     ULCORN='╔'
@@ -37,13 +44,12 @@ class lines:
     BLCORN='╚'
     BRCORN='╝'
 
-class moveCodes:
-    UP1 = "\033[1A" 
-
 class _Getch:
-    # Code from http://code.activestate.com/recipes/134892/
-    """Gets a single character from standard input.  Does not echo to the
-screen."""
+    """
+    Code for retrieving a single character from the screen. Does not echo it.
+    Source: http://code.activestate.com/recipes/134892/
+    """
+
     def __init__(self):
         try:
             self.impl = _GetchWindows()
@@ -54,7 +60,8 @@ screen."""
 
 
 class _GetchUnix:
-    # Code from http://code.activestate.com/recipes/134892/
+    """Companion code for _Getch used on Unix. Same source."""
+
     def __init__(self):
         import tty, sys
 
@@ -71,7 +78,8 @@ class _GetchUnix:
 
 
 class _GetchWindows:
-    # Code from http://code.activestate.com/recipes/134892/
+    """Companion code for _Getch used on Windows. Same source."""
+
     def __init__(self):
         import msvcrt
 
@@ -83,15 +91,24 @@ class _GetchWindows:
 getch = _Getch()
 
 def stripAnsi(string):
+    """
+    Return a string stripped of any ANSI control characters. This is useful if
+    you need to measure the length of the string for centering and whatnot.
+
+    Requires all imported from the pyparsing library (from pyparsing import *).
+
+    Source:
+    http://stackoverflow.com/questions/2186919/
+    getting-correct-string-length-in-python-for-strings-with-ansi-color-codes
+    """
+
     ESC = Literal('\x1b')
     integer = Word(nums)
-    escapeSeq = Combine(ESC + '[' + Optional(delimitedList(integer,';')) + 
+    escapeSeq = Combine(ESC + '[' + Optional(delimitedList(integer,';')) +
                     oneOf(list(alphas)))
 
     nonAnsiString = lambda s : Suppress(escapeSeq).transformString(s)
-
     unColorString = nonAnsiString(string)
-
     return unColorString
 
 def calculatePadding(textLength, fullRequested=False, alignLeft=None):
@@ -115,6 +132,9 @@ def calculatePadding(textLength, fullRequested=False, alignLeft=None):
     as described under "For centering" is currently not used for anything. It
     is implied to be True and automatically reset from its default of False
     when alignLeft is given a value.
+
+    This function is copied verbatim from my mental math problems program, and
+    some of the options are probably not necessary (right now!).
     """
 
     if alignLeft is not None:
@@ -149,17 +169,18 @@ def center(string):
 
     return calculatePadding(len(stripAnsi(string))) + string
 
-def horizontalRule(char='-'):
+def horizontalRule(char='—'):
     """
     Return a string that is a full-screen horizontal rule for the current
     screen width.  Optional argument: the character to use for the rule.
     """
 
-    return '—' * SCREEN_WIDTH
+    return char * SCREEN_WIDTH
 
 def clearscreen():
     """Clear the console screen."""
-    print ""
+
+    print "" # sometimes the display ends up off if you don't do this
     if os.name == "posix":
         os.system('clear')
     elif os.name in ("nt", "dos", "ce"):
@@ -169,15 +190,13 @@ def clearscreen():
 
 def text_box(text, centerBox=True, centerText=False):
     """
-    Create a box containing the provided text.
+    Return the string for a box containing the provided string.
 
     Arguments:
     - text: The text. Can be multiple lines; each line should not be longer than
       (SCREEN_WIDTH - 4) or an error will be thrown.
     - centerBox: Whether to center the box within the SCREEN_WIDTH. Default true.
     - centerText: Whether to center the text within the box. Default false.
-
-    Returns the box as a (multi-line) string.
     """
 
     if '\n' in text:
@@ -219,10 +238,21 @@ def text_box(text, centerBox=True, centerText=False):
     return boxString
 
 def entry_square():
+    """
+    Directly print a bracket-box to hold the cursor when waiting for
+    single-char user input. Running this function draws the box and puts the
+    cursor inside. No return.
+    """
+
     padding = ' ' * (SCREEN_WIDTH - 3)
     print padding + colors.GREEN + "[ ]" + colors.ENDC + "\b\b",
 
 def ask_input(prompt):
+    """
+    Ask for extended input with raw_input. Prints prompt (using appropriate
+    color), returns the user's input.
+    """
+
     print colors.RED + prompt + colors.YELLOW,
     search = raw_input()
     print colors.ENDC

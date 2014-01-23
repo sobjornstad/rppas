@@ -1,7 +1,24 @@
 import sqlite3 as sqlite
 import operator
+import getpass
+from functools import cmp_to_key
+import locale
 
 ### FULL-DATABASE OPERATIONS ###
+
+def access_control():
+    """
+    Ask for a password; should be run before initialize(). The DB is not
+    encrypted and the password is stored in plaintext; this is just a fast way
+    to keep out casual meddlers.
+
+    While working on the program, you probably want to comment the call out at
+    the bottom of this file.
+    """
+
+    pw = getpass.getpass("Password: ")
+    if pw != 'Mauddie':
+        exit()
 
 def initialize():
     global connection, cursor
@@ -125,6 +142,58 @@ def get_entry_eid(entry):
     else:
         return None
 
+def occurrences_around(ntype, nnum, page, margin=1):
+    """
+    Find other entries located on the same or a nearby page.
+
+    Arguments:
+    - ntype, nnum, page to look around.
+    - (optional) Margin of nearby pages to look at as well, if possible (if the
+      page number of this entry is not a valid int, we won't be able to do it,
+      and we will in all cases miss non-int nearby index entries). Default
+      value is 1.
+
+    Returns a sorted list of page, entry tuples for display.
+    """
+
+    # find the nid of the notebook we're looking at
+    cursor.execute('SELECT nid FROM notebooks WHERE ntype = ? AND nnum= ?', (ntype, nnum))
+    nid = cursor.fetchall()[0][0]
+
+    # should we accept nearby pages? by how much?
+    try:
+        # if the page is a simple int, we can give a fudge factor around it
+        pageLow = int(page) - margin
+        pageHigh = int(page) + margin
+    except ValueError:
+        # sometimes we'll only be able to give the exact page if not int-convertible
+        pageLow, pageHigh = page, page
+
+    # find occurrences with similar pages
+    cursor.execute('SELECT eid, page FROM occurrences \
+                    WHERE nid = ? AND page BETWEEN ? AND ?',\
+                    (nid, pageLow, pageHigh))
+    # now find what entries they belong to
+    results = {}
+    counter = 0
+    for i in cursor.fetchall():
+        cursor.execute('SELECT name FROM entries WHERE eid = ?', (i[0],))
+        results[counter] = (i[1], cursor.fetchall()[0][0])
+        counter += 1
+
+    # multi-step sort: put the dict into a list of tuples, sort by number, then
+    #                  by non-case-sensitive alphabetical
+    sort_step1 = sorted(results.iteritems(), key=operator.itemgetter(1))
+    results_sorted = []
+    for i in sort_step1:
+        results_sorted.append(i[1])
+    # I don't have the slightest idea what this is doing, but it works.
+    # http://stackoverflow.com/questions/2494740/sort-a-list-of-tuples-without-case-sensitivity
+    results_sorted.sort(key=lambda t : tuple(s.lower() if \
+                        isinstance(s,basestring) else s for s in t))
+
+    return results_sorted
+
 def add_entry(entry, ntype, nnum, pagenum):
     # get notebook ID
     cursor.execute('SELECT nid FROM notebooks WHERE ntype = ? AND nnum = ?', (ntype, nnum))
@@ -207,10 +276,13 @@ def dump_index():
 
 ##########
 
+#access_control() # comment this out for testing
 initialize()
+
 if __name__ == "__main__":
     # run any function you'd like, to test it
-    print dump_notebooks()
+    #print dump_notebooks()
+    print occurrences_around('CB', 6, 12)
     #print get_notebook_info(2, "ntype, nid, dopened, events, dclosed, nnum")
     #rewrite_notebook_dates(2, "2013-04-01", "2013-05-04")
 

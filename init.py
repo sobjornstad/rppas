@@ -1,2 +1,2 @@
 import frontend
-frontend.main_menu()
+frontend.main_screen()

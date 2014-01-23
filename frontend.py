@@ -85,8 +85,8 @@ def search_screen():
     else:
         print "No results."
 
-    keys = ['L', 'S', 'W', 'Q']
-    commands = {'L':'Lookup', 'S':'Search again', 'W':'When was', 'Q':'Quit'}
+    keys = ['L', 'S', 'N', 'W', 'Q']
+    commands = {'L':'Lookup', 'S':'Search again', 'N':'Nearby', 'W':'When was', 'Q':'Quit'}
     print_commands(keys, commands, '')
     termdisplay.entry_square()
 
@@ -101,6 +101,8 @@ def search_screen():
                 return 'break' # see below comment on 'q'
         elif c == 'w':
             when_was()
+        elif c == 'n':
+            nearby()
         elif c == 'q':
             # even if we run search several times, we only want to press q once
             return 'break'
@@ -111,6 +113,28 @@ def search_screen():
         else:
             print '\b!\b',
             continue
+
+def nearby():
+    print ""
+    ntype = termdisplay.ask_input("Nearby type:")
+    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
+    nnum  = termdisplay.ask_input("        num:")
+    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
+    page  = termdisplay.ask_input("        page:")
+
+    results = backend.occurrences_around(ntype, nnum, page)
+
+    formatStr = termdisplay.colors.GREEN + "%s%i" + \
+                termdisplay.colors.ENDC + '.' + \
+                termdisplay.colors.BLUE + "%s\t" + \
+                termdisplay.colors.WHITE + "%s" + \
+                termdisplay.colors.ENDC
+
+    for i in results:
+        print formatStr % (ntype, int(nnum), i[0], i[1])
+
+    termdisplay.entry_square()
+
 
 def list_notebooks():
     # start with no filters
@@ -257,4 +281,4 @@ def main_screen():
             continue
 
 if __name__ == "__main__":
-    main_screen()
+    print "Please run init.py to start the Indexer."

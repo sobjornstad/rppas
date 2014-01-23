@@ -17,9 +17,11 @@ def lookup_by_number(results):
     try:
         index = int(index)
     except ValueError:
-        lookup_by_number(results)
-
-    lookup_action(results[index][0])
+        # maybe they typed the word instead; if not, they'll be told no matches
+        lookup_action(index)
+    else:
+        # lookup by word
+        lookup_action(results[index][0])
 
 def lookup_action(search):
     """
@@ -58,11 +60,11 @@ def lookup_action(search):
             charcount += 2 # for the comma and space
             loopcount += 1
     else:
+        # should only happen when manual lookup by entering name
         print "No results."
 
     print ""
     termdisplay.entry_square()
-
 
 def search_screen():
     print_title()

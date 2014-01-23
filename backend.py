@@ -134,6 +134,7 @@ def get_nid(ntype, nnum):
 ### ENTRY OPERATIONS ###
 
 def get_entry_eid(entry):
+    """Given an entry's name, return its eid."""
     cursor.execute('SELECT eid FROM entries WHERE name = ?;', (entry,))
     eid = cursor.fetchall()
     if eid:
@@ -148,10 +149,10 @@ def occurrences_around(ntype, nnum, page, margin=1):
 
     Arguments:
     - ntype, nnum, page to look around.
-    - (optional) Margin of nearby pages to look at as well, if possible (if the
-      page number of this entry is not a valid int, we won't be able to do it,
-      and we will in all cases miss non-int nearby index entries). Default
-      value is 1.
+    - (optional) Margin of nearby pages to look at as well, if possible. If the
+      page number of this entry is not a valid int, we won't be able to do it.
+      I'm not sure why, but it will *find* ranges (but can't search on them). 
+      Default value is 1.
 
     Returns a sorted list of page, entry tuples for display.
     """
@@ -195,6 +196,19 @@ def occurrences_around(ntype, nnum, page, margin=1):
     return results_sorted
 
 def add_entry(entry, ntype, nnum, pagenum):
+    """
+    Create a new occurrence, adding the entry if it does not already exist.
+    The arguments should be obvious from the declaration.
+    
+    This function does *not* commit the changes for performance reasons; the
+    calling function should handle doing it when convenient so the changes are
+    not lost if the program crashes.
+
+    The notebook specified must exist.
+    """
+
+    #TODO: We should modify this to check for the notebook not existing
+
     # get notebook ID
     cursor.execute('SELECT nid FROM notebooks WHERE ntype = ? AND nnum = ?', (ntype, nnum))
     nid = cursor.fetchall()
@@ -215,33 +229,43 @@ def add_entry(entry, ntype, nnum, pagenum):
         print "Occurrence %s already exists." % entry.upper()
 
 def fetch_occurrences(eid):
-    # Given an EID, get occurrences that match it.
+    """
+    Given an EID, get occurrences that match it.
+
+    Return occurrence locations in the form of a list of tuples:
+        (sequential number, (ntype, nnum, page)).
+    
+    The sequential number is not meaningful and actually should probably be
+    cleaned up here so every caller doesn't have to remove it. #TODO
+    """
 
     cursor.execute('SELECT occurrences.nid, occurrences.page FROM occurrences \
                     WHERE eid = ?', (eid,))
 
     # Loop over list of occurrences that reference entry. Store each match's ref
     # in a dictionary using a match_num ID used only here.
-    matches = {}
-    match_num = 1
+    matches = []
     for i in cursor.fetchall():
         nid, pagenum = i
         cursor.execute('SELECT notebooks.ntype, notebooks.nnum FROM notebooks \
                         WHERE nid = ?', (nid,))
         ntype, nnum = cursor.fetchall()[0]
 
-        matches[match_num] = (ntype, nnum, pagenum)
-        match_num += 1
+        matches.append((ntype, nnum, pagenum))
 
     # sort in order placed: by type, notebook num, page num
     # unfortunately, does alphabetical sort on numbers in pagenums, as that field
     # must be a string for other reasons
-    matches_sorted = sorted(matches.iteritems(), key=operator.itemgetter(1))
-    return matches_sorted
+    matches.sort()
+    return matches
 
 
 def lookup(search):
-    #TODO: What if nothing found
+    """
+    Look up the occurrences of an entry given the name of the entry.
+
+    Returns same format as fetch_occurrences().
+    """
     #TODO: Consider different formatting possibilities
 
     # find EID of entry to search for, find all occurrences that reference it
@@ -253,6 +277,17 @@ def lookup(search):
     return matches
 
 def search_entries(search):
+    """
+    Given a search string, find entries containing that substring.
+
+    Returns a dictionary:
+    - KEYS: numerical IDs (to be displayed and used to select)
+    - VALUES: strings representing the entries
+
+    (To look up one of the entries, then, the user can enter a number and the
+    program can pull out the text of the entry using the dictionary, then use
+    get_entry_eid.)
+    """
     search = "%" + search + "%"
     cursor.execute('SELECT name FROM entries \
                     WHERE name LIKE ? \
@@ -262,7 +297,7 @@ def search_entries(search):
     matches = {}
     matchnum = 1
     for match in cursor.fetchall():
-        matches[matchnum] = match
+        matches[matchnum] = match[0]
         matchnum += 1
 
     if not matches:
@@ -271,6 +306,7 @@ def search_entries(search):
         return len(matches), matches
 
 def dump_index():
+    """Return list of tuples of EID and name of all entries. Not currently used."""
     cursor.execute('SELECT eid, name FROM entries ORDER BY name')
     return cursor.fetchall()
 
@@ -280,9 +316,10 @@ def dump_index():
 initialize()
 
 if __name__ == "__main__":
+    print fetch_occurrences(6)
     # run any function you'd like, to test it
     #print dump_notebooks()
-    print occurrences_around('CB', 6, 12)
+    #print occurrences_around('CB', 6, 12)
     #print get_notebook_info(2, "ntype, nid, dopened, events, dclosed, nnum")
     #rewrite_notebook_dates(2, "2013-04-01", "2013-05-04")
 

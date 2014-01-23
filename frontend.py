@@ -30,7 +30,7 @@ def lookup_by_number(results):
         lookup_action(index)
     else:
         # lookup by number
-        lookup_action(results[index][0])
+        lookup_action(results[index])
 
 def lookup_action(search):
     """
@@ -51,7 +51,7 @@ def lookup_action(search):
         charcount = termlen + 2 + 5
 
         for i in matches:
-            charcount += len("%s%i.%s" % (i[1][0], i[1][1], i[1][2]))
+            charcount += len("%s%i.%s" % (i[0], i[1], i[2]))
             if charcount > termdisplay.SCREEN_WIDTH:
                 print '\b,\n ' + ' ' * termlen,
                 loopcount = 0
@@ -62,9 +62,9 @@ def lookup_action(search):
                         termdisplay.colors.BLUE + ".%s" + \
                         termdisplay.colors.ENDC
             if loopcount == 0:
-                print formatStr % (i[1][0], i[1][1], i[1][2]),
+                print formatStr % (i[0], i[1], i[2]),
             else:
-                print "\b, " + formatStr % (i[1][0], i[1][1], i[1][2]),
+                print "\b, " + formatStr % (i[0], i[1], i[2]),
 
             charcount += 2 # for the comma and space
             loopcount += 1
@@ -81,7 +81,7 @@ def search_screen():
     results, matches = backend.search_entries(search)
     if matches:
         for i in matches:
-            print "%i:\t%s" % (i, matches[i][0])
+            print "%i:\t%s" % (i, matches[i])
     else:
         print "No results."
 
@@ -109,7 +109,7 @@ def search_screen():
         elif c in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
             # simply look up that item; last line of the lookup_by_number fn
             print ""
-            lookup_action(matches[int(c)][0])
+            lookup_action(matches[int(c)])
         else:
             print '\b!\b',
             continue

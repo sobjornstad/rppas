@@ -1,8 +1,6 @@
 import sqlite3 as sqlite
 import operator
 import getpass
-from functools import cmp_to_key
-import locale
 
 ### FULL-DATABASE OPERATIONS ###
 

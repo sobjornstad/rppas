@@ -5,6 +5,7 @@ from pyparsing import *
 
 class colors:
     # http://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
+    BLACK = '\033[40m'
     RED = '\033[31m'
     GREEN = '\033[32m'
     YELLOW = '\033[33m'
@@ -35,6 +36,9 @@ class lines:
     URCORN='╗'
     BLCORN='╚'
     BRCORN='╝'
+
+class moveCodes:
+    UP1 = "\033[1A" 
 
 class _Getch:
     # Code from http://code.activestate.com/recipes/134892/
@@ -217,3 +221,10 @@ def text_box(text, centerBox=True, centerText=False):
 def entry_square():
     padding = ' ' * (SCREEN_WIDTH - 3)
     print padding + colors.GREEN + "[ ]" + colors.ENDC + "\b\b",
+
+def ask_input(prompt):
+    print colors.RED + prompt + colors.YELLOW,
+    search = raw_input()
+    print colors.ENDC
+    return search
+

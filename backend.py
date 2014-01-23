@@ -183,10 +183,9 @@ def search_entries(search):
         matchnum += 1
 
     if not matches:
-        return None, None
+        return 0, None
     else:
-        results = "\b%i results." % len(matches)
-        return results, matches
+        return len(matches), matches
 
 def dump_index():
     cursor.execute('SELECT eid, name FROM entries ORDER BY name')

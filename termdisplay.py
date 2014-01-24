@@ -9,9 +9,9 @@ from config import SCREEN_WIDTH, TITLE
 class colors:
     """
     A class storing ANSI escape codes for coloring text. All data are strings.
-    To use, do something like colors.RED + "red text" + colors.ENDC.
+    To use, do something like 'print colors.RED + "red text" + colors.ENDC'.
 
-    Source (this version somewhat modified):
+    Original source (this version somewhat modified):
     http://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
     """
 
@@ -287,6 +287,16 @@ def print_title():
     print ""
 
 def print_commands(keys, commands, title):
+    """
+    Display a menu of available commands. Arguments:
+    - keys: a list of access keys, in the order they should appear in the menu
+    - commands: a dictionary: keys the same as the list of keys above, values
+      the text of the menu items
+    - title: The text to display above the box. An empty string is fine.
+
+    No return; the caller must get input and handle it.
+    """
+
     print center(colors.GREEN + title + colors.ENDC)
     displayString = ''
     for i in keys:

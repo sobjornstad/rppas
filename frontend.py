@@ -134,7 +134,7 @@ def search_screen():
     termdisplay.entry_square()
 
     while True:
-        c = getch()
+        c = getch().lower()
         if c == 'l':
             print ""
             lookup_by_number(matches)
@@ -203,7 +203,7 @@ def list_notebooks():
         termdisplay.print_commands(keys, commands, '')
         termdisplay.entry_square()
 
-        c = getch()
+        c = getch().lower()
         if c == 'e':
             print ""
             r = edit_notebook()
@@ -264,7 +264,7 @@ def notebooks_screen():
         termdisplay.print_title()
         termdisplay.print_commands(keys, commands, '  Notebooks')
         termdisplay.entry_square()
-        c = getch()
+        c = getch().lower()
 
         if c == 'l':
             list_notebooks()
@@ -295,7 +295,7 @@ def main_screen():
         termdisplay.print_title()
         termdisplay.print_commands(keys, commands, '  Main')
         termdisplay.entry_square()
-        c = getch()
+        c = getch().lower()
 
         if c == 's':
             search_screen()

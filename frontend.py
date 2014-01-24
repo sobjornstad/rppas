@@ -104,8 +104,7 @@ def when_was():
 
     print ""
     ntype = termdisplay.ask_input("When was type:")
-    print termdisplay.moveCodes.UP1 + termdisplay.moveCodes.UP1
-    nnum  = termdisplay.ask_input("          num:")
+    nnum  = termdisplay.ask_input("          num:", extended=True)
     nid = backend.get_nid(ntype, nnum)
     #also add events
     dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")

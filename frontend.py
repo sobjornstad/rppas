@@ -248,9 +248,23 @@ def edit_notebook():
         return
 
     dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")
-    nopen = termdisplay.ask_input("Open date [%s]:" % dopened, extended=True)
-    nclose = termdisplay.ask_input("Close date [%s]:" % dclosed, extended=True)
-    # validation of dates would be a good thing
+    while True:
+        nopen = termdisplay.ask_input("Open date [%s]:" % dopened, extended=True)
+        nclose = termdisplay.ask_input("Close date [%s]:" % dclosed, extended=True)
+
+        # use current as defaults (bracketed)
+        if not nopen:
+            nopen = dopened
+        if not nclose:
+            nclose = dclosed
+
+        # make sure dates are valid
+        if not backend.valid_date(nopen) and backend.valid_date(nclose):
+            print "Invalid date(s). Try again.\n"
+        elif nopen > nclose:
+            print "Specified open date is after close date! Try again.\n"
+        else:
+            break
 
     backend.rewrite_notebook_dates(nid, nopen, nclose)
 

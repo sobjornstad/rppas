@@ -11,8 +11,6 @@
   think it's using a string comparison, which works fine when the YYYY-MM-DD is
   done properly. Enforce proper date format.
 
-- Date validation, in a few places. See esp. above, as well as edit_notebook().
-
 
 FEATURE REQUESTS
   (from self)

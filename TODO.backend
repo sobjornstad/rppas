@@ -1,9 +1,8 @@
-- nearby() catches things that are "nearby" in fewer digits: e.g., 6: 59-61.
-  We can partially fix this by using leading zeroes on single-digit values;
-  for the low tens of the TBs, it's still a problem. The latter is not a high
-  priority but would obviously be better fixed.
-
-- occurrences_around() uses a pointless dictionary.
+- nearby() doesn't work with digit boundaries: CB13.9 finds nothing because
+  nothing comes between '8' and '10' alphabetically. This can be fixed with
+  mandatory leading 0's, but once again the TB problem comes up -- leading
+  zeroes there is kind of annoying. Maybe that latter problem can be solved by
+  handling and not displaying the leading 0's.
 
 - add_entry() doesn't do any validation on if the notebook exists.
   Also, it should try to enforce leading zero page numbers.

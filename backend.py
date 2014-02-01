@@ -182,15 +182,36 @@ def get_entry_eid(entry):
     else:
         return None
 
+def check_exact_match(number, pageLow, pageHigh):
+    """
+    Determine if a match returned from nearby() query is actually a match.
+    See the comment in the call in occurrences_around for why this happens.
+
+    This function returns FALSE if argument 'number' (the number returned as a
+    possibly valid entry by the database query) doesn't exactly match one of
+    the numbers within margin. If number is a range, check both parts of it and
+    allow if one of them matches.
+
+    Return True if this match should be kept, False if it should be deleted.
+    """
+
+    acceptable_matches = number.split('-') # one-element list if not a range
+    for i in acceptable_matches:
+        for j in range(pageLow, pageHigh + 1):
+            if str(j) == i:
+                return True
+
+    return False
+
+
 def occurrences_around(ntype, nnum, page, margin=1):
     """
-    Find other entries located on the same or a nearby page.
+    Find other entries that are used on the same or a nearby page.
 
     Arguments:
-    - ntype, nnum, page to look around.
-    - (optional) Margin of nearby pages to look at as well, if an int is given.
-      Surprisingly, this will find ranges, and can even search on ranges.
-      Default value is 1.
+    - ntype, nnum, page to look around. Page must be an int or we will crash.
+    - (optional) Margin of nearby pages to look at as well. This will find
+      ranges. Default value is 1.
 
     Returns a list of (page, entry) tuples sorted first numerically by page,
     then alphabetically by entry.
@@ -201,39 +222,39 @@ def occurrences_around(ntype, nnum, page, margin=1):
     nid = cursor.fetchall()[0][0]
 
     # what page range are we looking at?
-    try:
-        pageLow = int(page) - margin
-        pageHigh = int(page) + margin
-    except ValueError:
-        # if the user entered a non-int page (perhaps a range), just search that
-        pageLow, pageHigh = page, page
+    pageLow = page - margin
+    pageHigh = page + margin
 
-    # find occurrences with similar pages; surprisingly, BETWEEN works
-    # perfectly on strings, and even finds ranges
+    # find occurrences in same notebook with similar pages; surprisingly,
+    # BETWEEN works perfectly on strings, and even finds ranges
     cursor.execute('SELECT eid, page FROM occurrences \
                     WHERE nid = ? AND page BETWEEN ? AND ?',\
                     (nid, pageLow, pageHigh))
 
     # now find what entries they belong to
-    results = {}
+    results = []
     counter = 0
     for i in cursor.fetchall():
         cursor.execute('SELECT name FROM entries WHERE eid = ?', (i[0],))
-        results[counter] = (i[1], cursor.fetchall()[0][0])
+        results.append((i[1], cursor.fetchall()[0][0]))
         counter += 1
 
-    # multi-step sort: put the dict into a list of tuples, sort by number, then
-    #                  by non-case-sensitive alphabetical
-    sort_step1 = sorted(results.iteritems(), key=operator.itemgetter(1))
-    results_sorted = []
-    for i in sort_step1:
-        results_sorted.append(i[1])
-    # I don't have the slightest idea what this is doing, but it works.
+    # Some of these results might not be correct. For instance, searching
+    # around '6' gets you 5, 6, 7 (correctly), but also 50-70. Remove any that
+    # are wrong. (Leading zero enforcement should prevent this, but this should
+    # head off any number of possible sort/between bugs.)
+    for i in results[:]:
+        if not check_exact_match(i[0], pageLow, pageHigh):
+            results.remove(i)
+
+    # I don't have the slightest idea what this is doing, but it implements the
+    # sort I want: first by page number, then alphabetically (non-case-
+    # sensitively) by entry
     # http://stackoverflow.com/questions/2494740/sort-a-list-of-tuples-without-case-sensitivity
-    results_sorted.sort(key=lambda t : tuple(s.lower() if \
+    results.sort(key=lambda t : tuple(s.lower() if \
                         isinstance(s,basestring) else s for s in t))
 
-    return results_sorted
+    return results
 
 def add_occurrence(entry, ntype, nnum, pagenum):
     """

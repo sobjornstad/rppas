@@ -75,12 +75,13 @@ def nearby():
     No arguments; all requisite information is input within the function.
     """
 
+    #TODO: Validation: prohibit non-int pages, impossible types/nums
     print ""
     ntype = termdisplay.ask_input("Nearby type:")
     nnum  = termdisplay.ask_input("        num:", extended=True)
     page  = termdisplay.ask_input("        page:", extended=True)
 
-    results = backend.occurrences_around(ntype, nnum, page)
+    results = backend.occurrences_around(ntype, nnum, int(page))
 
     formatStr = termdisplay.colors.GREEN + "%s%i" + \
                 termdisplay.colors.ENDC + '.' + \
@@ -88,8 +89,12 @@ def nearby():
                 termdisplay.colors.WHITE + "%s" + \
                 termdisplay.colors.ENDC
 
-    for i in results:
-        print formatStr % (ntype, int(nnum), i[0], i[1])
+    #TODO: Ranges can cause tabbing to look ugly
+    if results:
+        for i in results:
+            print formatStr % (ntype, int(nnum), i[0], i[1])
+    else:
+        print "No results."
 
     termdisplay.entry_square()
 

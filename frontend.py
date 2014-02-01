@@ -54,6 +54,7 @@ def lookup_action(search):
                         termdisplay.colors.BLUE + ".%s" + \
                         termdisplay.colors.ENDC
             if loopcount == 0:
+                # ntype, nnum, pagenum
                 print formatStr % (i[0], i[1], i[2]),
             else:
                 print "\b, " + formatStr % (i[0], i[1], i[2]),
@@ -61,7 +62,6 @@ def lookup_action(search):
             charcount += 2 # for the comma and space
             loopcount += 1
     else:
-        # should only happen when manual lookup by entering name
         print "No results."
 
     print ""

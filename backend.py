@@ -1,14 +1,15 @@
 import sqlite3 as sqlite
 import operator
 import getpass
+from config import PASSWORD
 
 ### FULL-DATABASE OPERATIONS ###
 
 def access_control():
     """
     Ask for a password; should be run before initialize(). The DB is not
-    encrypted and the password is stored in plaintext; this is just a fast way
-    to keep out casual meddlers.
+    encrypted and the password is stored in plaintext in config.py; this is
+    just a fast way to keep out casual meddlers.
 
     While working on the program, you probably want to comment the call out at
     the bottom of this file.
@@ -17,7 +18,7 @@ def access_control():
     """
 
     pw = getpass.getpass("Password: ")
-    if pw != 'Mauddie':
+    if pw != PASSWORD:
         exit()
 
 def initialize():

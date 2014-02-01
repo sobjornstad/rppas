@@ -22,3 +22,4 @@ FEATURE REQUESTS
 - search_entries() - this is also a frontend thing - Allow a "starts with"
   search, like the STO directory, for things like "UI" and "IT" that are often
   substrings. Maybe a case-sensitive option too?
+- Add support for events.

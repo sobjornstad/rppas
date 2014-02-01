@@ -199,11 +199,14 @@ def text_box(text, centerBox=True, centerText=False):
     else:
         text = [text]
 
+    # find the lengths of each string so we know how much padding to use later
     textMeasure = []
     for i in range(len(text)):
         textMeasure.append(stripAnsi(text[i]))
 
-    # account for 4 more columns: 2 for padding, 2 for box
+    # Find longest line to know how wide to make the box; make sure the box
+    # isn't wider than the screen.
+    # Account for 4 extra columns: 2 for padding between box/text, 2 for box
     width = len(max(textMeasure, key=len)) + 2
     assert ((width + 2) <= SCREEN_WIDTH), "Line %s too long!" % max(text, key=len)
 
@@ -239,7 +242,7 @@ def text_box(text, centerBox=True, centerText=False):
 def clearscreen():
     """Clear the console screen."""
 
-    print "" # sometimes the display ends up off if you don't do this
+    print "" # sometimes the display ends up off by a line if you don't do this
     if os.name == "posix":
         os.system('clear')
     elif os.name in ("nt", "dos", "ce"):
@@ -263,9 +266,9 @@ def ask_input(prompt, extended=True):
     color), returns the user's input.
 
     The optional extended parameter is used if there are several ask_inputs in
-    a row, in which case there is too large a gap between them normally.
-    Extended should be enabled on ones subsequent to the first to remove this
-    gap.
+    a row, in which case there is too large a gap between them normally due to
+    the carriage return when the user presses Enter. Extended should be
+    enabled on ones subsequent to the first to remove this gap.
     """
 
     if extended:

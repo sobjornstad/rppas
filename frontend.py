@@ -20,8 +20,12 @@ def lookup_by_number(results):
         # maybe they typed the word instead; if not, they'll be told no matches
         lookup_action(index)
     else:
-        # lookup by number
-        lookup_action(results[index])
+        # lookup by number; make sure it's a value that was in the results
+        if index > len(results):
+            print "Invalid lookup number."
+            return
+        else:
+            lookup_action(results[index])
 
 def lookup_action(search):
     """
@@ -65,7 +69,6 @@ def lookup_action(search):
         print "No results."
 
     print ""
-    termdisplay.entry_square()
 
 def nearby():
     """
@@ -105,8 +108,6 @@ def nearby():
     else:
         print "No results."
 
-    termdisplay.entry_square()
-
 def when_was():
     """
     Option from the search screen to find the date a notebook was open, so that
@@ -135,7 +136,6 @@ def when_was():
     dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")
 
     print "That happened between %s and %s." % (dopened, dclosed)
-    termdisplay.entry_square()
 
 def search_screen():
     """
@@ -156,9 +156,9 @@ def search_screen():
     commands = {'L':'Lookup', 'S':'Search again', 'N':'Nearby',
                 'W':'When was', 'Q':'Quit'}
     termdisplay.print_commands(keys, commands, '')
-    termdisplay.entry_square()
 
     while True:
+        termdisplay.entry_square()
         c = getch().lower()
         if c == 'l':
             print ""
@@ -179,7 +179,7 @@ def search_screen():
             print ""
             lookup_action(matches[int(c)])
         else:
-            print '\b!\b',
+            print ""
             continue
 
 def list_notebooks():

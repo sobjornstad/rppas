@@ -4,13 +4,8 @@
   zeroes there is kind of annoying. Maybe that latter problem can be solved by
   handling and not displaying the leading 0's.
 
-- add_entry() doesn't do any validation on if the notebook exists.
-  Also, it should try to enforce leading zero page numbers.
-
-- Notebooks filter seems to break if we don't use leading zeroes in dates -- I
-  think it's using a string comparison, which works fine when the YYYY-MM-DD is
-  done properly. Enforce proper date format.
-
+- Add back ability to import.
+- Ability to add entries (do events first so the DB structure is done I think).
 
 FEATURE REQUESTS
   (from self)
@@ -20,3 +15,4 @@ FEATURE REQUESTS
   search, like the STO directory, for things like "UI" and "IT" that are often
   substrings. Maybe a case-sensitive option too?
 - Add support for events.
+- Printing list.

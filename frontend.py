@@ -75,11 +75,20 @@ def nearby():
     No arguments; all requisite information is input within the function.
     """
 
-    #TODO: Validation: prohibit non-int pages, impossible types/nums
-    print ""
-    ntype = termdisplay.ask_input("Nearby type:")
-    nnum  = termdisplay.ask_input("        num:", extended=True)
-    page  = termdisplay.ask_input("        page:", extended=True)
+    while True:
+        print ""
+        ntype = termdisplay.ask_input("Nearby type:")
+        nnum  = termdisplay.ask_input("        num:", extended=True)
+        page  = termdisplay.ask_input("        page:", extended=True)
+        try:
+            nnum, page = int(nnum), int(page)
+        except ValueError:
+            print "Invalid entry!"
+            continue
+        if backend.validate_location(ntype, nnum, page):
+            break
+        else:
+            print "Invalid entry!"
 
     results = backend.occurrences_around(ntype, nnum, int(page))
 
@@ -107,9 +116,20 @@ def when_was():
     No arguments; all requisite information is input within the function.
     """
 
-    print ""
-    ntype = termdisplay.ask_input("When was type:")
-    nnum  = termdisplay.ask_input("          num:", extended=True)
+    while True:
+        print ""
+        ntype = termdisplay.ask_input("When was type:")
+        nnum  = termdisplay.ask_input("          num:", extended=True)
+        try:
+            nnum = int(nnum)
+        except ValueError:
+            print "Invalid entry!"
+            continue
+        if backend.validate_location(ntype, nnum):
+            break
+        else:
+            print "Invalid entry!"
+
     nid = backend.get_nid(ntype, nnum)
     #also add events
     dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")
@@ -215,13 +235,24 @@ def list_notebooks():
             if r == 'break':
                 return 'break' # see below comment on 'q'
         elif c == 'f':
-            print ""
-            dopened = termdisplay.ask_input("Opened after:")
-            dclosed = termdisplay.ask_input("Closed before:", extended=True)
+            while True:
+                print ""
+                dopened = termdisplay.ask_input("Opened after:")
+                dclosed = termdisplay.ask_input("Closed before:", extended=True)
+                if backend.valid_date(dopened) and backend.valid_date(dclosed):
+                    break
+                else:
+                    print "Invalid date!"
+
             filtered = 'filterRange'
         elif c == 'o':
-            print ""
-            dat = termdisplay.ask_input("Open at:")
+            while True:
+                print ""
+                dat = termdisplay.ask_input("Open at:")
+                if backend.valid_date(dat):
+                    break
+                else:
+                    print "Invalid date!"
             filtered = 'openAt'
         elif c == 'c':
             dopened, dclosed, dat, filtered = None, None, None, None

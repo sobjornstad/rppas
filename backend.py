@@ -1,7 +1,7 @@
 import sqlite3 as sqlite
 import operator
 import getpass
-from config import PASSWORD, VALID_YEAR_RANGE
+from config import PASSWORD, VALID_YEAR_RANGE, NOTEBOOK_TYPES, NOTEBOOK_SIZES
 
 ### FULL-DATABASE OPERATIONS ###
 
@@ -420,6 +420,33 @@ def valid_date(date, unlimited_years=False):
     # if all these checks pass, the date should be valid
     return True
 
+def validate_location(ntype, nnum, pagenum=None):
+    """
+    Check whether information the user has entered for a Nearby or When Was
+    query can actually be used successfully to look up information.
+
+    Requires ntype and nnum; pagenum is optional.
+
+    Returns True if valid, False if invalid.
+    """
+
+    # make sure notebook exists
+    if ntype not in NOTEBOOK_TYPES:
+        return False
+    if type(nnum) != int:
+        return False
+    if not get_nid(ntype, nnum):
+        return False
+
+    # check that page is positive and less than max for that notebook
+    if pagenum: # optional test
+        if type(pagenum) != int:
+            return False
+        if (pagenum < 1) or (pagenum > NOTEBOOK_SIZES[ntype]):
+            return False
+
+    return True
+
 
 ##########
 
@@ -427,7 +454,8 @@ def valid_date(date, unlimited_years=False):
 initialize()
 
 if __name__ == "__main__":
+    pass
     # testing area; not run in normal operation
     #print fetch_occurrences(6)
-    #occurrences_around('CB', 2, 5)
-    print valid_date('2007-2-28')
+    #print validate_location('CB', 2, 8)
+    #print valid_date('2007-2-28')

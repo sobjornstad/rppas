@@ -351,6 +351,10 @@ def main_screen():
             search_screen()
         elif c == 'n':
             notebooks_screen()
+        elif c == 'i':
+            print ""
+            f = termdisplay.ask_input("Filename:")
+            backend.import_from_base(f)
         elif c == 'q' or c == '\x03': # ctrl-c
             backend.cleanup()
         else:

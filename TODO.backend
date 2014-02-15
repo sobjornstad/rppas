@@ -4,7 +4,6 @@
   zeroes there is kind of annoying. Maybe that latter problem can be solved by
   handling and not displaying the leading 0's.
 
-- Add back ability to import.
 - Ability to add entries (do events first so the DB structure is done I think).
 
 FEATURE REQUESTS

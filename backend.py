@@ -45,7 +45,7 @@ def cleanup():
 def create_notebook(ntype, nnum, opend, closed, events):
     """
     Create a notebook, given the parameters. If a notebook with the type and
-    number already exists, print error and do nothing further.
+    number already exists, do nothing and return False.
 
     To leave out a parameter, pass string NULL.
 
@@ -447,6 +447,28 @@ def validate_location(ntype, nnum, pagenum=None):
 
     return True
 
+def import_from_base(filename):
+    f = open(filename)
+    for line in f:
+        EID, ntype, nnum, page, entry = line.split('\t')
+        nnum = int(nnum)
+        entry = entry.strip()
+        page = page.strip()
+
+        create_notebook(ntype, nnum, "NULL", "NULL", "NULL")
+
+        # Commas signify several occurrences of the entry, to be processed
+        # separately, but a 'see FOO' entry might have commas and shouldn't
+        # be split.
+        if ',' in page and 'see' not in page:
+            pages = page.split(',')
+            for i in pages:
+                i = i.strip()
+                add_occurrence(entry, ntype, nnum, i)
+        else: # single entry
+            add_occurrence(entry, ntype, nnum, page)
+
+    connection.commit()
 
 ##########
 

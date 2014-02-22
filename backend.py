@@ -447,6 +447,33 @@ def validate_location(ntype, nnum, pagenum=None):
 
     return True
 
+def zero_pad(i, ntype):
+    """
+    Add appropriate leading zeroes for an occurrence string. Determines whether
+    one is needed based on the string length and the notebook type under
+    consideration.
+
+    Arguments: string to pad, notebook type.
+    Return: padded string.
+    """
+
+    if len(i) == 2:
+        if NOTEBOOK_SIZES[ntype] <= 99:
+            pass
+        elif NOTEBOOK_SIZES[ntype] <= 999:
+            i = '0' + i
+    elif len(i) == 1:
+        assert ntype in NOTEBOOK_TYPES
+        if NOTEBOOK_SIZES[ntype] <= 99:
+            i = '0' + i
+        elif NOTEBOOK_SIZES[ntype] <= 999:
+            i = '00' + i
+        else:
+            print "WARNING: Your notebooks are very large. Unable to correctly pad page numbers with leading zeroes."
+
+    return i
+
+
 def import_from_base(filename):
     f = open(filename)
     for line in f:
@@ -455,17 +482,19 @@ def import_from_base(filename):
         entry = entry.strip()
         page = page.strip()
 
-        create_notebook(ntype, nnum, "NULL", "NULL", "NULL")
+        create_notebook(ntype, nnum, "NULL", "NULL", "NULL") # cancels if existing
 
         # Commas signify several occurrences of the entry, to be processed
         # separately, but a 'see FOO' entry might have commas and shouldn't
-        # be split.
+        # be split. This might break on a "see also," but we can't be perfect.
         if ',' in page and 'see' not in page:
             pages = page.split(',')
             for i in pages:
                 i = i.strip()
+                i = zero_pad(i, ntype)
                 add_occurrence(entry, ntype, nnum, i)
         else: # single entry
+            page = zero_pad(page, ntype)
             add_occurrence(entry, ntype, nnum, page)
 
     connection.commit()

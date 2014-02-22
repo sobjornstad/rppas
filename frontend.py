@@ -175,9 +175,17 @@ def search_screen():
             # even if we run search several times, we only want to press q once
             return 'break'
         elif c in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
-            # simply look up that item; last line of the lookup_by_number fn
+            # simply look up that item; equivalent to the last lines of the
+            # lookup_by_number() function
             print ""
-            lookup_action(matches[int(c)])
+            try:
+                c = int(c)
+            except:
+                print "Invalid lookup number."
+            if c > len(matches):
+                print "Invalid lookup number."
+            else:
+                lookup_action(matches[c])
         else:
             print ""
             continue

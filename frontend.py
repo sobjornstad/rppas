@@ -82,7 +82,7 @@ def nearby():
         print ""
         ntype = termdisplay.ask_input("Nearby type:")
         nnum  = termdisplay.ask_input("        num:", extended=True)
-        page  = termdisplay.ask_input("        page:", extended=True)
+        page  = termdisplay.ask_input("       page:", extended=True)
         try:
             nnum, page = int(nnum), int(page)
         except ValueError:

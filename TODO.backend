@@ -15,3 +15,4 @@ FEATURE REQUESTS
   substrings. Maybe a case-sensitive option too?
 - Add support for events.
 - Printing list.
+- Allow some keystroke (^C? Esc?) to cancel an active search/whatever.

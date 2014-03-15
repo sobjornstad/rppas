@@ -1,6 +1,7 @@
 import termdisplay
 import backend
 from termdisplay import getch
+import config
 
 def lookup_by_number(results):
     """
@@ -266,6 +267,44 @@ def list_notebooks():
             dopened, dclosed, dat, filtered = None, None, None, None
         elif c == 'q':
             return 'break'
+
+def add_notebook():
+    """
+    Create a new notebook. No arguments, no return.
+
+    Doesn't support events yet.
+    """
+
+    while True:
+        print ""
+        ntype = termdisplay.ask_input("Type to add:")
+        if ntype not in config.NOTEBOOK_TYPES:
+            print "Invalid notebook type!"
+        else:
+            break
+
+    while True:
+        nnum = termdisplay.ask_input("Number to add:", extended=True)
+        nid = backend.get_nid(ntype, nnum)
+        if nid != 0:
+            print "Notebook already exists!"
+        else:
+            break
+
+    while True:
+        dopened = termdisplay.ask_input("Date opened:", extended=True)
+        dclosed = termdisplay.ask_input("Date closed:", extended=True)
+        if not (backend.valid_date(dopened) and backend.valid_date(dclosed)):
+            print "Invalid date(s)!"
+            print ""
+        elif dopened > dclosed:
+            print "Specified open date is after close date!"
+            print ""
+        else:
+            break
+
+    backend.create_notebook(ntype, nnum, dopened, dclosed, "NULL")
+    backend.connection.commit()
 
 def edit_notebook():
     """

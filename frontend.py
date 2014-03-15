@@ -2,6 +2,7 @@ import termdisplay
 import backend
 from termdisplay import getch
 import config
+from time import sleep
 
 def lookup_by_number(results):
     """
@@ -193,6 +194,47 @@ def search_screen():
             print ""
             continue
 
+def add_event(nid):
+    event = termdisplay.ask_input("Event name:", extended=True)
+    while True:
+        isSpecial = termdisplay.ask_input("Special? (y/n):", extended=True)
+        if isSpecial.lower() == 'y':
+            isSpecial = True
+            break
+        elif isSpecial.lower() == 'n':
+            isSpecial = False
+            break
+        else:
+            print "Please type 'y' or 'n'.\n"
+
+    ok = backend.create_event(nid, event, isSpecial)
+    if not ok:
+        print "Whoops, that event already exists!"
+        termdisplay.entry_square()
+        getch()
+
+def delete_event(events, specials):
+    """
+    Ask for the key number to delete and remove it from the database.
+
+    Arguments: The events and specials dictionaries storing the current state
+               of events (no pun intended).
+    Return: None.
+    """
+
+    events.update(specials)
+
+    while True:
+        todel = termdisplay.ask_input("Number to delete:")
+        try:
+            todel = int(todel)
+        except ValueError:
+            print "Enter the number of the item to delete."
+        else:
+            break
+    evid_todel = events[todel][0]
+    backend.delete_event(evid_todel)
+
 def events_screen():
     """
     Screen that allows the user to look at and modify events in a selected
@@ -207,49 +249,63 @@ def events_screen():
 
         nid = backend.get_nid(ntype, nnum)
         if nid == 0:
-            print "Nonexistent notebook, try again."
+            print "Nonexistent notebook, please try again."
             termdisplay.entry_square()
             getch()
         else:
             break
-    events, specials = backend.fetch_notebook_events(nid)
 
-    # switch to using a user-friendly numeric listing, but save the nid
-    counter = 1
-    newEvents, newSpecials = {}, {}
-    for i in events:
-        newEvents[counter] = (i, events[i])
-        counter += 1
-    for i in specials:
-        newSpecials[counter] = (i, specials[i])
-        counter += 1
-    events, specials = newEvents, newSpecials
-
-    # output list of events
-    print termdisplay.colors.BLUE + "\nEvents:" + termdisplay.colors.ENDC
-    for i in events:
-        print "%i:\t%s" % (i, events[i][1])
-    print termdisplay.colors.BLUE + "\nSpecials:" + termdisplay.colors.ENDC
-    for i in specials:
-        print "%i:\t%s" % (i, specials[i][1])
-
-    keys = ['A', 'E', 'D', 'S', 'Q']
-    commands = {'A':'Add', 'E':'Edit', 'D':'Delete',
-                'S':'Switch Book', 'Q':'Quit'}
-    termdisplay.print_commands(keys, commands, '')
-
-    # there's some copied code in here
     while True:
+        # unfortunately we have to start the loop waaaaaay up here so we can
+        # update the list after making a change
+
+        termdisplay.print_title()
+        events, specials = backend.fetch_notebook_events(nid)
+
+        # switch to using a user-friendly numeric listing, but save the nid
+        counter = 1
+        newEvents, newSpecials = {}, {}
+        for i in events:
+            newEvents[counter] = (i, events[i])
+            counter += 1
+        for i in specials:
+            newSpecials[counter] = (i, specials[i])
+            counter += 1
+        events, specials = newEvents, newSpecials
+
+        # output list of events
+        #TODO: What to do if the event name is too long to fit on the line comfortably
+        print termdisplay.center("Events for %s%s%s%s" % (ntype, termdisplay.colors.GREEN, nnum, termdisplay.colors.ENDC))
+        print termdisplay.colors.BLUE + "\nEvents:" + termdisplay.colors.ENDC
+        for i in events:
+            print "%i:\t%s" % (i, events[i][1])
+        print termdisplay.colors.BLUE + "\nSpecials:" + termdisplay.colors.ENDC
+        for i in specials:
+            print "%i:\t%s" % (i, specials[i][1])
+
+        keys = ['A', 'D', 'S', 'U', 'B', 'Q']
+        commands = {'A':'Add', 'D':'Delete', 'S':'Save changes',
+                    'U':'Undo changes', 'B':'Change book', 'Q':'Quit'}
+        termdisplay.print_commands(keys, commands, '')
+
+        # there's some copied code in here
         termdisplay.entry_square()
         c = getch().lower()
         if c == 'a':
             print ""
-            lookup_by_number(matches)
-        elif c == 'e':
-            when_was()
+            add_event(nid)
         elif c == 'd':
-            nearby()
+            print ""
+            delete_event(events, specials)
         elif c == 's':
+            backend.connection.commit()
+            print "\b\b\bSaved."
+            sleep(0.5)
+        elif c == 'u':
+            backend.connection.rollback()
+            print "\b\b\b\bUndone."
+            sleep(0.5)
+        elif c == 'b':
             r = events_screen()
             if r == 'break':
                 return 'break' # see below comment on 'q'

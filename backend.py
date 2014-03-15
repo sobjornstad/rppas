@@ -565,6 +565,16 @@ def rewrite_event(evid, nid, event, isSpec=False):
             (nid, event, isSpec, evid))
     return True
 
+def delete_event(evid):
+    """
+    Delete the event with specified evid from database. No return.
+    
+    Does not commit changes in case you make a mistake and want to use
+    rollback.
+    """
+
+    cursor.execute('DELETE FROM events WHERE evid=?', (evid,))
+
 def fetch_notebook_events(nid):
     """
     Given a nid, find all events that take place in that notebook.

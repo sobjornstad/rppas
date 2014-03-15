@@ -378,7 +378,7 @@ def add_notebook():
         else:
             break
 
-    backend.create_notebook(ntype, nnum, dopened, dclosed, "NULL")
+    backend.create_notebook(ntype, nnum, dopened, dclosed)
     backend.connection.commit()
 
 def edit_notebook():

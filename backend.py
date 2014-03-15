@@ -58,7 +58,7 @@ def cleanup():
 
 ### NOTEBOOK OPERATIONS ###
 
-def create_notebook(ntype, nnum, opend, closed, events):
+def create_notebook(ntype, nnum, opend, closed):
     """
     Create a notebook, given the parameters. If a notebook with the type and
     number already exists, do nothing and return False.
@@ -75,8 +75,8 @@ def create_notebook(ntype, nnum, opend, closed, events):
         return False
 
     else: # good to go
-        cursor.execute('INSERT INTO notebooks VALUES (null, ?, ?, ?, ?, ?)',
-                      (ntype, nnum, opend, closed, events))
+        cursor.execute('INSERT INTO notebooks VALUES (null, ?, ?, ?, ?)',
+                      (ntype, nnum, opend, closed))
         return True
 
 def rewrite_notebook_dates(nid, opend, closed):
@@ -113,7 +113,7 @@ def get_nid(ntype, nnum):
 def dump_notebooks():
     """
     Return a list of tuples of all non-ID attributes of all notebooks, in the
-    order (ntype, nnum, dopened, dclosed, events). This is intended to be used
+    order (ntype, nnum, dopened, dclosed). This is intended to be used
     in displaying a list to the user, so nid is skipped; if you need it for a
     given notebook to do something with it, just run get_nid.
 
@@ -123,7 +123,7 @@ def dump_notebooks():
     automatically fetches the data for *all* notebooks instead of just one.
     """
 
-    cursor.execute('SELECT ntype, nnum, dopened, dclosed, events FROM notebooks \
+    cursor.execute('SELECT ntype, nnum, dopened, dclosed FROM notebooks \
                     ORDER BY ntype, nnum')
     return cursor.fetchall()
 
@@ -133,10 +133,10 @@ def dump_dated_notebooks(dopened, dclosed):
     opened before a given date and closed after a given date.
 
     Specifically, the return is a list of tuples (ntype, nnum, dopened,
-    dclosed, events).
+    dclosed).
     """
 
-    cursor.execute('SELECT ntype, nnum, dopened, dclosed, events FROM notebooks \
+    cursor.execute('SELECT ntype, nnum, dopened, dclosed FROM notebooks \
                     WHERE dopened >= ? AND dclosed <= ? \
                     ORDER BY ntype, nnum', (dopened, dclosed))
     return cursor.fetchall()
@@ -147,10 +147,10 @@ def dump_open_notebooks(dat):
     open on a specific date.
     
     Specifically, the return is a list of tuples (ntype, nnum, dopened,
-    dclosed, events).
+    dclosed).
     """
 
-    cursor.execute('SELECT ntype, nnum, dopened, dclosed, events FROM notebooks \
+    cursor.execute('SELECT ntype, nnum, dopened, dclosed FROM notebooks \
                     WHERE dopened <= ? AND dclosed >= ? \
                     ORDER BY ntype, nnum', (dat, dat))
     return cursor.fetchall()
@@ -165,7 +165,6 @@ def get_notebook_info(nid, columns):
     - nnum
     - dopened
     - dclosed
-    - events
 
     No validation of the provided column names is performed; make sure they're
     right before calling this function.
@@ -499,7 +498,7 @@ def import_from_base(filename):
         entry = entry.strip()
         page = page.strip()
 
-        create_notebook(ntype, nnum, "NULL", "NULL", "NULL") # cancels if existing
+        create_notebook(ntype, nnum, "NULL", "NULL") # cancels if existing
 
         # Commas signify several occurrences of the entry, to be processed
         # separately, but a 'see FOO' entry might have commas and shouldn't

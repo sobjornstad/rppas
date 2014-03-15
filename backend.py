@@ -79,11 +79,6 @@ def create_notebook(ntype, nnum, opend, closed, events):
                       (ntype, nnum, opend, closed, events))
         return True
 
-def rewrite_notebook_events(nid, events):
-    """Update the events field on notebook with specified nid. No return."""
-    cursor.execute('UPDATE notebooks SET events=? WHERE nid=?', (events, nid))
-    connection.commit()
-
 def rewrite_notebook_dates(nid, opend, closed):
     """Update the dates on notebook with specified nid. No return."""
     cursor.execute('UPDATE notebooks SET dopened=?, dclosed=? WHERE nid=?', \
@@ -485,7 +480,7 @@ def zero_pad(i, ntype):
         elif NOTEBOOK_SIZES[ntype] <= 999:
             i = '00' + i
         else:
-            print "WARNING: Your notebooks are very large. Unable to correctly pad page numbers with leading zeroes."
+            termdisplay.warn("Your notebooks are very large. Unable to correctly pad page numbers with leading zeroes.")
 
     return i
 
@@ -521,6 +516,76 @@ def import_from_base(filename):
 
     connection.commit()
 
+### EVENTS ###
+def get_evid(event, nid):
+    """
+    Given an event description and notebook, return the event ID, or None if it
+    doesn't exist.
+    """
+
+    cursor.execute('SELECT evid FROM events WHERE event = ? AND nid = ?', (event,nid))
+    evid = cursor.fetchall()
+    if not evid:
+        return None
+    elif len(evid) > 1:
+        # this is unlikely to happen, but just in case, say something
+        termdisplay.warn("Multiple events in notebook " + str(nid) + " with the same name!")
+    else:
+        return evid[0][0]
+
+def create_event(nid, event, isSpec=False):
+    """
+    Add *event* to the list of events for notebook *nid*. Optional argument
+    isSpec specifies whether this is a "special event" -- i.e. associated with
+    a particular date and written in the notebook's TOC in blue. This defaults
+    to False.
+
+    The event will not be created if it already exists. Returns False if it
+    did, True if the event was added successfully.
+    """
+
+    # make sure an event by this name and notebook doesn't already exist
+    if get_evid(event, nid):
+        return False
+    cursor.execute('INSERT INTO events VALUES (null, ?, ?, ?)', (nid, event, isSpec))
+    return True
+
+def rewrite_event(evid, nid, event, isSpec=False):
+    """
+    Works like create_event, but updates an existing event. Added first
+    argument: the evid to overwrite. The evid provided must exist.
+
+    Returns True if successful, false if evid to update not found.
+    """
+
+    cursor.execute('SELECT evid FROM events WHERE evid = ?', (evid,))
+    if not cursor.fetchall():
+        return False
+
+    cursor.execute('UPDATE events SET nid=?, event=?, special=? WHERE evid=?', \
+            (nid, event, isSpec, evid))
+    return True
+
+def fetch_notebook_events(nid):
+    """
+    Given a nid, find all events that take place in that notebook.
+
+    Returns a tuple of two dictionaries: one for the standard events and one
+    for those with isSpecial set ("specials"). Each dictionary has keys of the
+    evids and values of the descriptions.
+    """
+
+    cursor.execute('SELECT evid, event, special FROM events WHERE nid = ?', (nid,))
+    events, specials = {}, {}
+    for i in cursor.fetchall():
+        if i[2] == True:
+            specials[i[0]] = i[1]
+        else:
+            events[i[0]] = i[1]
+
+    return events, specials
+
+
 ##########
 
 #access_control() # comment this out for testing
@@ -528,7 +593,11 @@ initialize()
 
 if __name__ == "__main__":
     pass
-    # testing area; not run in normal operation
-    #print fetch_occurrences(6)
-    #print validate_location('CB', 2, 8)
-    #print valid_date('2007-2-28')
+    create_event(1, "Soren is alive.", False)
+    rewrite_event(3, 1, "Soren is STILL alive!", True)
+    print get_evid("Soren is alive.", 1)
+    events, specials = fetch_notebook_events(1)
+    print "events are:\n%r" % events
+    print "specials are:\n%r" % specials
+
+    cleanup()

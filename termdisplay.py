@@ -307,3 +307,12 @@ def print_commands(keys, commands, title):
               colors.ENDC + commands[i] + '\n'
 
     print text_box(displayString.rstrip())
+
+def warn(message):
+    """
+    Halt to inform the user of a problem with the program or database. The
+    message provided will be written after "WARNING: ".
+    """
+
+    print "WARNING: " + message
+    raw_input("~ Strike any key to continue... ~")

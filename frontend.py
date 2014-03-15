@@ -193,6 +193,77 @@ def search_screen():
             print ""
             continue
 
+def events_screen():
+    """
+    Screen that allows the user to look at and modify events in a selected
+    notebook.
+    """
+
+    while True:
+        termdisplay.print_title()
+
+        ntype = termdisplay.ask_input("Type to view:")
+        nnum = termdisplay.ask_input("Number to view:", extended=True)
+
+        nid = backend.get_nid(ntype, nnum)
+        if nid == 0:
+            print "Nonexistent notebook, try again."
+            termdisplay.entry_square()
+            getch()
+        else:
+            break
+    events, specials = backend.fetch_notebook_events(nid)
+
+    # switch to using a user-friendly numeric listing, but save the nid
+    counter = 1
+    newEvents, newSpecials = {}, {}
+    for i in events:
+        newEvents[counter] = (i, events[i])
+        counter += 1
+    for i in specials:
+        newSpecials[counter] = (i, specials[i])
+        counter += 1
+    events, specials = newEvents, newSpecials
+
+    # output list of events
+    print termdisplay.colors.BLUE + "\nEvents:" + termdisplay.colors.ENDC
+    for i in events:
+        print "%i:\t%s" % (i, events[i][1])
+    print termdisplay.colors.BLUE + "\nSpecials:" + termdisplay.colors.ENDC
+    for i in specials:
+        print "%i:\t%s" % (i, specials[i][1])
+
+    keys = ['A', 'E', 'D', 'S', 'Q']
+    commands = {'A':'Add', 'E':'Edit', 'D':'Delete',
+                'S':'Switch Book', 'Q':'Quit'}
+    termdisplay.print_commands(keys, commands, '')
+
+    # there's some copied code in here
+    while True:
+        termdisplay.entry_square()
+        c = getch().lower()
+        if c == 'a':
+            print ""
+            lookup_by_number(matches)
+        elif c == 'e':
+            when_was()
+        elif c == 'd':
+            nearby()
+        elif c == 's':
+            r = events_screen()
+            if r == 'break':
+                return 'break' # see below comment on 'q'
+        elif c == 'q':
+            # even if we run search several times, we only want to press q once
+            return 'break'
+        elif c == '\x03': # ctrl-c
+            backend.sigint_handler()
+        else:
+            print ""
+            continue
+
+
+
 def list_notebooks():
     """
     Screen to display a list of notebooks, with or without filters. All
@@ -408,6 +479,8 @@ def main_screen():
             print ""
             f = termdisplay.ask_input("Filename:")
             backend.import_from_base(f)
+        elif c == 't':
+            events_screen()
         elif c == 'q' or c == '\x03': # ctrl-c
             backend.cleanup()
         else:

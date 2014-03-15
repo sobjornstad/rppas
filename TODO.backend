@@ -6,6 +6,8 @@
 
 - Ability to add entries (do events first so the DB structure is done I think).
 
+- Split things up into modules by unit worked with: notebooks, entries, etc.
+
 FEATURE REQUESTS
   (from self)
 ----------------
@@ -16,3 +18,5 @@ FEATURE REQUESTS
 - Add support for events.
 - Printing list.
 - Allow some keystroke (^C? Esc?) to cancel an active search/whatever.
+- Allow the entry of simply "CB6" or so instead of separate type and num entry fields.
+- Give events a definite order?

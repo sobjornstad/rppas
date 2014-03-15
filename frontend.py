@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import termdisplay
 import backend
 from termdisplay import getch
@@ -256,10 +258,8 @@ def events_screen():
             break
 
     while True:
-        # unfortunately we have to start the loop waaaaaay up here so we can
-        # update the list after making a change
-
         termdisplay.print_title()
+        dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")
         events, specials = backend.fetch_notebook_events(nid)
 
         # switch to using a user-friendly numeric listing, but save the nid
@@ -275,7 +275,12 @@ def events_screen():
 
         # output list of events
         #TODO: What to do if the event name is too long to fit on the line comfortably
-        print termdisplay.center("Events for %s%s%s%s" % (ntype, termdisplay.colors.GREEN, nnum, termdisplay.colors.ENDC))
+        print termdisplay.center("Events for %s%s%s%s" % (
+            termdisplay.colors.GREEN, ntype, nnum, termdisplay.colors.ENDC))
+        print termdisplay.center("  %s%s%s – %s%s%s" % (
+            termdisplay.colors.WHITE, dopened, termdisplay.colors.RED,
+            termdisplay.colors.WHITE, dclosed, termdisplay.colors.ENDC))
+
         print termdisplay.colors.BLUE + "\nEvents:" + termdisplay.colors.ENDC
         for i in events:
             print "%i:\t%s" % (i, events[i][1])
@@ -288,7 +293,6 @@ def events_screen():
                     'U':'Undo changes', 'B':'Change book', 'Q':'Quit'}
         termdisplay.print_commands(keys, commands, '')
 
-        # there's some copied code in here
         termdisplay.entry_square()
         c = getch().lower()
         if c == 'a':

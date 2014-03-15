@@ -1,6 +1,8 @@
 import sqlite3 as sqlite
 import operator
 import getpass
+import signal
+import sys
 from config import PASSWORD, VALID_YEAR_RANGE, NOTEBOOK_TYPES, NOTEBOOK_SIZES
 
 ### FULL-DATABASE OPERATIONS ###
@@ -21,6 +23,19 @@ def access_control():
     if pw != PASSWORD:
         exit()
 
+def sigint_handler(signal='', frame=''):
+    """
+    Run when Control-C is pressed at a menu or prompt. Runs the cleanup()
+    routine to commit any stray transactions and exit nicely.
+
+    Two optional arguments to accommodate signal.signal() as well as manual
+    calling. No return.
+    """
+
+    print ""
+    #print "Caught SIGINT, cleaning up..."
+    cleanup()
+
 def initialize():
     """
     Connect to the database; initialize backend module variables connection
@@ -32,12 +47,13 @@ def initialize():
     connection = sqlite.connect("records.db")
     connection.text_factory = str # fix for some weird Unicode error
     cursor = connection.cursor()
+    signal.signal(signal.SIGINT, sigint_handler) # for clean exit
 
 def cleanup():
     """Commit any remaining changes and quit program. Obviously no return."""
     connection.commit()
     connection.close()
-    exit()
+    sys.exit(0)
 
 
 ### NOTEBOOK OPERATIONS ###
@@ -475,6 +491,12 @@ def zero_pad(i, ntype):
 
 
 def import_from_base(filename):
+    """
+    Import from my previous database format, a Base file (exported to TSV).
+
+    Argument: name of the file to import. No return.
+    """
+
     f = open(filename)
     for line in f:
         EID, ntype, nnum, page, entry = line.split('\t')

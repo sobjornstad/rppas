@@ -175,6 +175,8 @@ def search_screen():
         elif c == 'q':
             # even if we run search several times, we only want to press q once
             return 'break'
+        elif c == '\x03': # ctrl-c
+            backend.sigint_handler()
         elif c in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
             # simply look up that item; equivalent to the last lines of the
             # lookup_by_number() function
@@ -267,6 +269,8 @@ def list_notebooks():
             dopened, dclosed, dat, filtered = None, None, None, None
         elif c == 'q':
             return 'break'
+        elif c == '\x03': # ctrl-c
+            backend.sigint_handler()
 
 def add_notebook():
     """
@@ -369,6 +373,8 @@ def notebooks_screen():
             add_notebook()
         elif c == 'q':
             break
+        elif c == '\x03': # ctrl-c
+            backend.sigint_handler()
         else:
             continue
 

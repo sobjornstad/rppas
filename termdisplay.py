@@ -279,6 +279,24 @@ def ask_input(prompt, extended=True):
     print colors.ENDC
     return search
 
+def fake_input(prompt, user_input, extended=True):
+    """
+    Fake asking for a line of input with ask_input. Prints *prompt* and
+    *user_input* as if the user had entered it in response.
+
+    The optional extended parameter is used if there are several ask_inputs in
+    a row, in which case there is too large a gap between them normally due to
+    the carriage return when the user is faked to have pressed Enter. Extended
+    should be enabled on ones subsequent to the first to remove this gap.
+
+    No return.
+    """
+
+    if extended:
+        prompt = moveCodes.UP1 + prompt
+
+    print colors.RED + prompt + colors.YELLOW + ' ' + user_input + colors.ENDC + '\n'
+
 def print_title():
     """
     Clear the screen and print config.TITLE and an HR to the top of the screen.

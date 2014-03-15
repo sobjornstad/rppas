@@ -136,19 +136,21 @@ def when_was():
             print "Invalid entry!"
 
     nid = backend.get_nid(ntype, nnum)
-    #also add events
-    dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")
+    events_screen(ntype, nnum)
 
-    print "That happened between %s and %s." % (dopened, dclosed)
-
-def search_screen():
+def search_screen(search=None):
     """
     Screen that allows the user to search for index entries matching a query,
     then optionally run a lookup, When was, or Nearby.
+
+    Optional argument: the search to run. Otherwise the user will be asked.
     """
 
     termdisplay.print_title()
-    search = termdisplay.ask_input("Search:")
+    if not search:
+        search = termdisplay.ask_input("Search:")
+    else:
+        termdisplay.fake_input("Search:", search)
     results, matches = backend.search_entries(search)
     if matches:
         for i in matches:
@@ -173,6 +175,9 @@ def search_screen():
                 return 'break' # see below comment on 'q'
         elif c == 'w':
             when_was()
+            r = search_screen(search)
+            if r == 'break':
+                return 'break' # see below comment on 'q'
         elif c == 'n':
             nearby()
         elif c == 'q':
@@ -237,10 +242,13 @@ def delete_event(events, specials):
     evid_todel = events[todel][0]
     backend.delete_event(evid_todel)
 
-def events_screen():
+def events_screen(ntype=None, nnum=None):
     """
     Screen that allows the user to look at and modify events in a selected
     notebook.
+
+    Optional arguments specify the notebook type and number to show; if not
+    specified, the user will be asked which one to look at.
     """
 
     first = True # clear screen only when switching books; 
@@ -252,8 +260,9 @@ def events_screen():
         else:
             termdisplay.print_title()
 
-        ntype = termdisplay.ask_input("Type to view:")
-        nnum = termdisplay.ask_input("Number to view:", extended=True)
+        if not (ntype and nnum):
+            ntype = termdisplay.ask_input("Type to view:")
+            nnum = termdisplay.ask_input("Number to view:", extended=True)
 
         nid = backend.get_nid(ntype, nnum)
         if nid == 0:

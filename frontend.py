@@ -243,8 +243,14 @@ def events_screen():
     notebook.
     """
 
+    first = True # clear screen only when switching books; 
+                 # keep the table of books displayed the first time
     while True:
-        termdisplay.print_title()
+        if first:
+            first = False
+            print ""
+        else:
+            termdisplay.print_title()
 
         ntype = termdisplay.ask_input("Type to view:")
         nnum = termdisplay.ask_input("Number to view:", extended=True)
@@ -398,6 +404,8 @@ def list_notebooks():
             filtered = 'openAt'
         elif c == 'c':
             dopened, dclosed, dat, filtered = None, None, None, None
+        elif c == 'v':
+            events_screen()
         elif c == 'q':
             return 'break'
         elif c == '\x03': # ctrl-c
@@ -539,8 +547,6 @@ def main_screen():
             print ""
             f = termdisplay.ask_input("Filename:")
             backend.import_from_base(f)
-        elif c == 't':
-            events_screen()
         elif c == 'q' or c == '\x03': # ctrl-c
             backend.cleanup()
         else:

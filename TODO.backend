@@ -8,6 +8,9 @@
 
 - Split things up into modules by unit worked with: notebooks, entries, etc.
 
+- Move add notebooks into a subset of list and add the rollback/commit options
+  As Seen On Events List™.
+
 FEATURE REQUESTS
   (from self)
 ----------------
@@ -15,8 +18,11 @@ FEATURE REQUESTS
 - search_entries() - this is also a frontend thing - Allow a "starts with"
   search, like the STO directory, for things like "UI" and "IT" that are often
   substrings. Maybe a case-sensitive option too?
-- Add support for events.
+
 - Printing list.
+
 - Allow some keystroke (^C? Esc?) to cancel an active search/whatever.
+
 - Allow the entry of simply "CB6" or so instead of separate type and num entry fields.
+
 - Give events a definite order?

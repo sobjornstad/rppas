@@ -8,8 +8,13 @@
 
 - Split things up into modules by unit worked with: notebooks, entries, etc.
 
+REMAINING THINGS TO IMPLEMENT IN EVENTS
+- Make events accessible from When Was.
+- Look through code for other places where I suggested we should implement events and do it.
+- Figure out how to fit searching for events in.
 - Move add notebooks into a subset of list and add the rollback/commit options
   As Seen On Events List™.
+- Give events a definite order?
 
 FEATURE REQUESTS
   (from self)
@@ -24,5 +29,3 @@ FEATURE REQUESTS
 - Allow some keystroke (^C? Esc?) to cancel an active search/whatever.
 
 - Allow the entry of simply "CB6" or so instead of separate type and num entry fields.
-
-- Give events a definite order?

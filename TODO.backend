@@ -8,13 +8,17 @@
 
 - Split things up into modules by unit worked with: notebooks, entries, etc.
 
+- Infinite loop when entering a nonexistent event and trying to do something
+  else (it gives the chance for user interaction in the middle, but you cannot
+  do anything except trigger the error again).
+
 REMAINING THINGS TO IMPLEMENT IN EVENTS
-- Make events accessible from When Was.
 - Look through code for other places where I suggested we should implement events and do it.
 - Figure out how to fit searching for events in.
 - Move add notebooks into a subset of list and add the rollback/commit options
-  As Seen On Events List™.
+  (As Seen On Events List™).
 - Give events a definite order?
+- Line wrapping.
 
 FEATURE REQUESTS
   (from self)
@@ -29,3 +33,5 @@ FEATURE REQUESTS
 - Allow some keystroke (^C? Esc?) to cancel an active search/whatever.
 
 - Allow the entry of simply "CB6" or so instead of separate type and num entry fields.
+
+- Allow searching within a search (this could be quite tricky).

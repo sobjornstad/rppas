@@ -423,8 +423,6 @@ def list_notebooks():
 def add_notebook():
     """
     Create a new notebook. No arguments, no return.
-
-    Doesn't support events yet.
     """
 
     while True:
@@ -462,9 +460,6 @@ def edit_notebook():
     """
     Edit the dates a notebook was open. Gets information within the function
     and returns nothing.
-
-    Later, should also edit the events. We don't have code to handle events
-    anywhere yet.
     """
 
     ntype = termdisplay.ask_input("Type to edit:")

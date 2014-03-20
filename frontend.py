@@ -171,20 +171,18 @@ def search_screen(search=None):
             lookup_by_number(matches)
         elif c == 's':
             r = search_screen()
-            if r == 'break':
-                return 'break' # see below comment on 'q'
+            return
         elif c == 'w':
             when_was()
             r = search_screen(search)
-            if r == 'break':
-                return 'break' # see below comment on 'q'
+            return
         elif c == 'n':
             nearby()
         elif c == 'r':
             search_screen(search)
         elif c == 'q':
             # even if we run search several times, we only want to press q once
-            return 'break'
+            return
         elif c == '\x03': # ctrl-c
             backend.sigint_handler()
         elif c in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
@@ -330,17 +328,15 @@ def events_screen(ntype=None, nnum=None):
             sleep(0.5)
         elif c == 'b':
             r = events_screen()
-            if r == 'break':
-                return 'break' # see below comment on 'q'
+            return
         elif c in ('+', '-'):
             adjNid = backend.adjacent_notebook(nid, (1 if c == '+' else -1))
             ntype, nnum = backend.get_notebook_info(adjNid, "ntype, nnum")
             r = events_screen(ntype, nnum)
-            if r == 'break':
-                return 'break' # see below comment on 'q'
+            return
         elif c == 'q':
             # even if we run search several times, we only want to press q once
-            return 'break'
+            return
         elif c == '\x03': # ctrl-c
             backend.sigint_handler()
         else:
@@ -403,8 +399,7 @@ def notebooks_screen():
         elif c == 'e':
             print ""
             r = edit_notebook()
-            if r == 'break':
-                return 'break' # see below comment on 'q'
+            return
         elif c == 'd':
             delete_notebook()
         elif c == 'f':
@@ -440,7 +435,7 @@ def notebooks_screen():
             print "\b\b\b\bUndone."
             sleep(0.5)
         elif c == 'q':
-            return 'break'
+            return
         elif c == '\x03': # ctrl-c
             backend.sigint_handler()
 

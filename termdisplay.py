@@ -321,8 +321,11 @@ def print_commands(keys, commands, title):
     print center(colors.GREEN + title + colors.ENDC)
     displayString = ''
     for i in keys:
-        displayString += colors.BLUE + '<' + i + '> ' + \
-              colors.ENDC + commands[i] + '\n'
+        if i == ' ':
+            displayString += '~~~~~~~~~~~~~~~~\n'
+        else:
+            displayString += colors.BLUE + '<' + i + '> ' + \
+                  colors.ENDC + commands[i] + '\n'
 
     print text_box(displayString.rstrip())
 

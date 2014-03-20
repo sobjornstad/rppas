@@ -83,12 +83,10 @@ def rewrite_notebook_dates(nid, opend, closed):
     """Update the dates on notebook with specified nid. No return."""
     cursor.execute('UPDATE notebooks SET dopened=?, dclosed=? WHERE nid=?', \
                   (opend, closed, nid))
-    connection.commit()
 
 def delete_notebook(nid):
     """Delete the notebook with specified nid from database. No return."""
-    cursor.execute('DELETE FROM notebooks WHERE nid=?', (nid))
-    connection.commit()
+    cursor.execute('DELETE FROM notebooks WHERE nid=?', (nid,))
 
 def get_nid(ntype, nnum):
     """

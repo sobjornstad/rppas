@@ -340,7 +340,7 @@ def events_screen(ntype=None, nnum=None):
 
 
 
-def list_notebooks():
+def notebooks_screen():
     """
     Screen to display a list of notebooks, with or without filters. All
     filtering and editing is done from within this screen.
@@ -380,18 +380,24 @@ def list_notebooks():
         for i in nlist:
             print formatStr % ((i[0] + str(i[1])), i[2], i[3])
 
-        keys = ['E', 'F', 'O', 'C', 'V', 'Q']
-        commands = {'E':'Edit', 'F': 'Filter', 'O':'Open at time',
-                    'C': 'Clear filter', 'V': 'Events', 'Q':'Quit'}
+        keys = ['A', 'E', 'D', 'S', 'U', ' ', 'F', 'O', 'C', 'V', 'Q']
+        commands = {'A':'Add', 'E':'Edit', 'D':'Delete',
+                    'F':'Filter', 'O':'Open at time',
+                    'C':'Clear filter', 'V':'Events',
+                    'S':'Save changes', 'U':'Undo changes', 'Q':'Quit'}
         termdisplay.print_commands(keys, commands, '')
         termdisplay.entry_square()
 
         c = getch().lower()
-        if c == 'e':
+        if c == 'a':
+            add_notebook()
+        elif c == 'e':
             print ""
             r = edit_notebook()
             if r == 'break':
                 return 'break' # see below comment on 'q'
+        elif c == 'd':
+            delete_notebook()
         elif c == 'f':
             while True:
                 print ""
@@ -416,6 +422,14 @@ def list_notebooks():
             dopened, dclosed, dat, filtered = None, None, None, None
         elif c == 'v':
             events_screen()
+        elif c == 's':
+            backend.connection.commit()
+            print "\b\b\bSaved."
+            sleep(0.5)
+        elif c == 'u':
+            backend.connection.rollback()
+            print "\b\b\b\bUndone."
+            sleep(0.5)
         elif c == 'q':
             return 'break'
         elif c == '\x03': # ctrl-c
@@ -494,33 +508,29 @@ def edit_notebook():
 
     backend.rewrite_notebook_dates(nid, nopen, nclose)
 
-def notebooks_screen():
-    """
-    Screen to allow listing and adding notebooks. Maybe something else later?
-    """
-
-    keys = ['L', 'A', 'Q']
-    commands = {'L':'List notebooks',
-                'A':'Add notebook',
-                'Q':'Quit',
-               }
+def delete_notebook():
+    while True:
+        print ""
+        ntype = termdisplay.ask_input("Type to delete:")
+        if ntype not in config.NOTEBOOK_TYPES:
+            print "Invalid notebook type!"
+        else:
+            break
 
     while True:
-        termdisplay.print_title()
-        termdisplay.print_commands(keys, commands, '  Notebooks')
-        termdisplay.entry_square()
-        c = getch().lower()
-
-        if c == 'l':
-            list_notebooks()
-        elif c == 'a':
-            add_notebook()
-        elif c == 'q':
-            break
-        elif c == '\x03': # ctrl-c
-            backend.sigint_handler()
-        else:
+        nnum = termdisplay.ask_input("Number to delete:", extended=True)
+        nid = backend.get_nid(ntype, nnum)
+        try:
+            nid = int(nid)
+        except:
+            print "Invalid number!"
             continue
+        if nid == 0:
+            print "Notebook does not exist!"
+        else:
+            break
+
+    backend.delete_notebook(nid)
 
 def main_screen():
     """

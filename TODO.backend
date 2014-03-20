@@ -11,8 +11,6 @@
 REMAINING THINGS TO IMPLEMENT IN EVENTS
 - Look through code for other places where I suggested we should implement events and do it.
 - Figure out how to fit searching for events in.
-- Move add notebooks into a subset of list and add the rollback/commit options
-  (As Seen On Events List™).
 - Give events a definite order?
 - Line wrapping.
 

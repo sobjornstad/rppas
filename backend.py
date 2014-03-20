@@ -177,6 +177,28 @@ def get_notebook_info(nid, columns):
     cursor.execute(query)
     return cursor.fetchall()[0]
 
+def adjacent_notebook(nid, direction):
+    """
+    Find the nid of the notebook numerically before or after the one of given
+    nid. Will look for the next notebook if direction is zero or positive, the
+    previous one if negative.
+
+    Returns the nid of the adjacent notebook. If there is no adjacent notebook
+    in that direction, quiet fail by returning the same nid passed.
+    """
+
+    ntype, nnum = get_notebook_info(nid, "ntype, nnum")
+
+    if direction >= 0:
+        nnum += 1
+    else:
+        nnum -= 1
+
+    if not get_nid(ntype, nnum):
+        return nid
+    else:
+        return get_nid(ntype, nnum)
+
 
 ### ENTRY OPERATIONS ###
 

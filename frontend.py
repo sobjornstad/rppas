@@ -158,9 +158,9 @@ def search_screen(search=None):
     else:
         print "No results."
 
-    keys = ['L', 'S', 'N', 'W', 'Q']
+    keys = ['L', 'S', 'N', 'W', 'R', 'Q']
     commands = {'L':'Lookup', 'S':'Search again', 'N':'Nearby',
-                'W':'When was', 'Q':'Quit'}
+                'W':'When was', 'R':'Reload', 'Q':'Quit'}
     termdisplay.print_commands(keys, commands, '')
 
     while True:
@@ -180,6 +180,8 @@ def search_screen(search=None):
                 return 'break' # see below comment on 'q'
         elif c == 'n':
             nearby()
+        elif c == 'r':
+            search_screen(search)
         elif c == 'q':
             # even if we run search several times, we only want to press q once
             return 'break'
@@ -304,9 +306,10 @@ def events_screen(ntype=None, nnum=None):
         for i in specials:
             print "%i:\t%s" % (i, specials[i][1])
 
-        keys = ['A', 'D', 'S', 'U', 'B', 'Q']
+        keys = ['A', 'D', 'S', 'U', 'B', '+', '-', 'Q']
         commands = {'A':'Add', 'D':'Delete', 'S':'Save changes',
-                    'U':'Undo changes', 'B':'Change book', 'Q':'Quit'}
+                    'U':'Undo changes', 'B':'Change book',
+                    '+':'Next book', '-':'Previous book', 'Q':'Quit'}
         termdisplay.print_commands(keys, commands, '')
 
         termdisplay.entry_square()
@@ -327,6 +330,12 @@ def events_screen(ntype=None, nnum=None):
             sleep(0.5)
         elif c == 'b':
             r = events_screen()
+            if r == 'break':
+                return 'break' # see below comment on 'q'
+        elif c in ('+', '-'):
+            adjNid = backend.adjacent_notebook(nid, (1 if c == '+' else -1))
+            ntype, nnum = backend.get_notebook_info(adjNid, "ntype, nnum")
+            r = events_screen(ntype, nnum)
             if r == 'break':
                 return 'break' # see below comment on 'q'
         elif c == 'q':

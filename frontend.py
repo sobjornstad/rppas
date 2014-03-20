@@ -253,6 +253,8 @@ def events_screen(ntype=None, nnum=None):
 
     first = True # clear screen only when switching books; 
                  # keep the table of books displayed the first time
+    needsUserInput = True if (ntype == None and nnum == None) else False
+
     while True:
         if first:
             first = False
@@ -260,15 +262,14 @@ def events_screen(ntype=None, nnum=None):
         else:
             termdisplay.print_title()
 
-        if not (ntype and nnum):
+        if needsUserInput:
             ntype = termdisplay.ask_input("Type to view:")
             nnum = termdisplay.ask_input("Number to view:", extended=True)
 
         nid = backend.get_nid(ntype, nnum)
         if nid == 0:
+            first = True # don't refresh screen
             print "Nonexistent notebook, please try again."
-            termdisplay.entry_square()
-            getch()
         else:
             break
 

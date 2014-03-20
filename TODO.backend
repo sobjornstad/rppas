@@ -8,10 +8,6 @@
 
 - Split things up into modules by unit worked with: notebooks, entries, etc.
 
-- Infinite loop when entering a nonexistent event and trying to do something
-  else (it gives the chance for user interaction in the middle, but you cannot
-  do anything except trigger the error again).
-
 REMAINING THINGS TO IMPLEMENT IN EVENTS
 - Look through code for other places where I suggested we should implement events and do it.
 - Figure out how to fit searching for events in.

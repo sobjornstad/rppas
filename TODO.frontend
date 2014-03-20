@@ -1,5 +1,5 @@
 - "refresh" button to go back to the main search screen and wipe out the stuff below it.
-
+- + and - buttons in the events browser (for next/prev notebook in ntype)
 
 - VERY FUTURE: Allow multiple fields in a line and tab between them, for Where
   was's and stuff.

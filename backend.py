@@ -587,8 +587,10 @@ def create_event(nid, event, isSpec=False):
     if get_evid(event, nid):
         return False
 
-    cursor.execute('SELECT MAX(sequence) FROM events')
-    seq = cursor.fetchall()[0][0] + 1
+    # one more than highest sequence number currently used in notebook's events
+    cursor.execute('SELECT MAX(sequence) FROM events WHERE nid = ?', (nid,))
+    try: seq = cursor.fetchall()[0][0] + 1
+    except TypeError: seq = 1
     cursor.execute('INSERT INTO events VALUES (null, ?, ?, ?, ?)', (nid, event, isSpec, seq))
     return True
 

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import termdisplay
-import backend
 from termdisplay import getch
+import backend
 import config
 from time import sleep
+import textwrap
 
 def lookup_by_number(results):
     """
@@ -45,7 +46,7 @@ def lookup_action(search):
 
         termlen = len(search) # to know how far to skip when breaking a line
         loopcount = 0
-        # 2 is for chars already there (space); 5 is a buffer I don't understand.
+        # 2 is for chars already there (space); 5 is a buffer I don't understand (probably spaces between listed occurrences).
         # It uses 12 when reset. I also don't understand this -- but they need
         # different values for some reason, and I don't see anything I did wrong.
         charcount = termlen + 2 + 5
@@ -299,10 +300,17 @@ def events_screen(ntype=None, nnum=None):
 
         print termdisplay.colors.BLUE + "\nEvents:" + termdisplay.colors.ENDC
         for i in events:
-            print "%i:\t%s" % (i, events[i][1])
+            lines = textwrap.wrap(events[i][1], config.SCREEN_WIDTH - 8)
+            print "%i:\t%s" % (i, lines.pop(0))
+            for line in lines:
+                print "   \t%s" % line
+
         print termdisplay.colors.BLUE + "\nSpecials:" + termdisplay.colors.ENDC
         for i in specials:
-            print "%i:\t%s" % (i, specials[i][1])
+            lines = textwrap.wrap(specials[i][1], config.SCREEN_WIDTH - 8)
+            print "%i:\t%s" % (i, lines.pop(0))
+            for line in lines:
+                print "   \t%s" % line
 
         keys = ['A', 'D', 'S', 'U', 'B', '+', '-', 'Q']
         commands = {'A':'Add', 'D':'Delete', 'S':'Save changes',

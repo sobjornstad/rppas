@@ -9,10 +9,8 @@
 - Split things up into modules by unit worked with: notebooks, entries, etc.
 
 REMAINING THINGS TO IMPLEMENT IN EVENTS
-- Look through code for other places where I suggested we should implement events and do it.
 - Figure out how to fit searching for events in.
 - Give events a definite order?
-- Line wrapping.
 
 FEATURE REQUESTS
   (from self)

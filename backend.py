@@ -566,23 +566,40 @@ def create_event(nid, event, isSpec=False):
     # make sure an event by this name and notebook doesn't already exist
     if get_evid(event, nid):
         return False
-    cursor.execute('INSERT INTO events VALUES (null, ?, ?, ?)', (nid, event, isSpec))
+
+    cursor.execute('SELECT MAX(sequence) FROM events')
+    seq = cursor.fetchall()[0][0] + 1
+    cursor.execute('INSERT INTO events VALUES (null, ?, ?, ?, ?)', (nid, event, isSpec, seq))
     return True
 
-def rewrite_event(evid, nid, event, isSpec=False):
+def reorder_events(evid1, evid2, nid):
     """
-    Works like create_event, but updates an existing event. Added first
-    argument: the evid to overwrite. The evid provided must exist.
+    Swaps the position numbers of two existing events in one notebook. The
+    evids provided must exist.
 
-    Returns True if successful, false if evid to update not found.
+    Returns True if successful, false if evid(s) to update not found.
     """
 
-    cursor.execute('SELECT evid FROM events WHERE evid = ?', (evid,))
-    if not cursor.fetchall():
-        return False
+    evids = (evid1, evid2)
+    seqs = []
 
-    cursor.execute('UPDATE events SET nid=?, event=?, special=? WHERE evid=?', \
-            (nid, event, isSpec, evid))
+    # I would make this one loop and use rollback(), but we're (sort of
+    # hackishly) using rollback as an undo function, and doing so might lead a
+    # user's other changes to be undone.
+    for i in evids:
+        cursor.execute('SELECT sequence FROM events WHERE evid = ?', (i,))
+        seq = cursor.fetchall()
+        if not seq:
+            return False
+        else:
+            seqs.append(seq)
+
+    print seqs
+    seqs[0], seqs[1] = seqs[1], seqs[0]
+    print seqs
+    for i in range(len(evids)):
+        print seqs[i][0][0], evids[i]
+        cursor.execute('UPDATE events SET sequence=? WHERE evid=?', (seqs[i][0][0], evids[i]))
     return True
 
 def delete_event(evid):
@@ -599,21 +616,28 @@ def fetch_notebook_events(nid):
     """
     Given a nid, find all events that take place in that notebook.
 
-    Returns a tuple of two dictionaries: one for the standard events and one
-    for those with isSpecial set ("specials"). Each dictionary has keys of the
-    evids and values of the descriptions.
+    Returns a tuple of two dictionaries and two lists. For the dictionaries:
+    one for the standard events and one for those with isSpecial set
+    ("specials"). Each dictionary has keys of the evids and values of the
+    descriptions.
+
+    The lists are the events and specials, in the order they should be
+    displayed.
     """
 
-    cursor.execute('SELECT evid, event, special FROM events WHERE nid = ?', (nid,))
+    cursor.execute('SELECT evid, event, special FROM events \
+                    WHERE nid = ? ORDER BY sequence', (nid,))
     events, specials = {}, {}
+    eventsOrder, specialsOrder = [], []
     for i in cursor.fetchall():
         if i[2] == True:
             specials[i[0]] = i[1]
+            specialsOrder.append(i[0])
         else:
             events[i[0]] = i[1]
+            eventsOrder.append(i[0])
 
-    return events, specials
-
+    return events, specials, eventsOrder, specialsOrder
 
 ##########
 

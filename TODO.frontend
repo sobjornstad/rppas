@@ -1,2 +1,4 @@
 - VERY FUTURE: Allow multiple fields in a line and tab between them, for Where
   was's and stuff.
+- Visible error for next/prev if we've reached the end? Maybe unnecessary.
+- Don't make ntype entries case-sensitive.

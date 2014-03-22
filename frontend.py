@@ -277,21 +277,22 @@ def events_screen(ntype=None, nnum=None):
     while True:
         termdisplay.print_title()
         dopened, dclosed = backend.get_notebook_info(nid, "dopened, dclosed")
-        events, specials = backend.fetch_notebook_events(nid)
+        events, specials, eventsOrder, specialsOrder = \
+                backend.fetch_notebook_events(nid)
 
-        # switch to using a user-friendly numeric listing, but save the nid
+        # switch to using a user-friendly numeric listing, but save the evid
         counter = 1
         newEvents, newSpecials = {}, {}
-        for i in events:
-            newEvents[counter] = (i, events[i])
+        for i in range(len(eventsOrder)):
+            newEvents[counter] = (eventsOrder[i], events[eventsOrder[i]])
             counter += 1
-        for i in specials:
-            newSpecials[counter] = (i, specials[i])
+        for i in range(len(specialsOrder)):
+            newSpecials[counter] = (specialsOrder[i], specials[specialsOrder[i]])
             counter += 1
         events, specials = newEvents, newSpecials
+        evDict = dict(events.items() + specials.items()) # for looking up evids
 
         # output list of events
-        #TODO: What to do if the event name is too long to fit on the line comfortably
         print termdisplay.center("Events for %s%s%s%s" % (
             termdisplay.colors.GREEN, ntype, nnum, termdisplay.colors.ENDC))
         print termdisplay.center("  %s%s%s – %s%s%s" % (
@@ -312,9 +313,9 @@ def events_screen(ntype=None, nnum=None):
             for line in lines:
                 print "   \t%s" % line
 
-        keys = ['A', 'D', 'S', 'U', 'B', '+', '-', 'Q']
-        commands = {'A':'Add', 'D':'Delete', 'S':'Save changes',
-                    'U':'Undo changes', 'B':'Change book',
+        keys = ['A', 'D', 'R', 'S', 'U', 'B', '+', '-', 'Q']
+        commands = {'A':'Add', 'D':'Delete', 'R':'Reposition',
+                    'S':'Save changes', 'U':'Undo changes', 'B':'Change book',
                     '+':'Next book', '-':'Previous book', 'Q':'Quit'}
         termdisplay.print_commands(keys, commands, '')
 
@@ -326,6 +327,27 @@ def events_screen(ntype=None, nnum=None):
         elif c == 'd':
             print ""
             delete_event(events, specials)
+        elif c == 'r':
+            ev1, ev2 = None, None
+            print ""
+            while True:
+                ev1 = termdisplay.ask_input("Event to reposition:")
+                try: ev1 = int(ev1)
+                except ValueError:
+                    print "Use event numbers to select events to reposition."
+                    continue
+                else: break
+            while True:
+                ev2 = termdisplay.ask_input("Swap with:", True)
+                try: ev2 = int(ev2)
+                except ValueError:
+                    print "Use event numbers to select events to reposition."
+                    continue
+                else: break
+
+            evid1 = evDict[ev1][0]
+            evid2 = evDict[ev2][0]
+            backend.reorder_events(evid1, evid2, nid)
         elif c == 's':
             backend.connection.commit()
             print "\b\b\bSaved."

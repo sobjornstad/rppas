@@ -552,6 +552,26 @@ def get_evid(event, nid):
     else:
         return evid[0][0]
 
+def isSpecial(evid):
+    """
+    Given an evid, determine if the associated event is considered a special or
+    just a plain event.
+
+    Return:
+    - True if it is.
+    - False if it isn't.
+    - None if no event by that evid even exists.
+    """
+
+    cursor.execute('SELECT special FROM events WHERE evid = ?', (evid,))
+    r = cursor.fetchall()
+    if not r:
+        return None
+    elif r[0][0] == 1:
+        return True
+    else:
+        return False
+
 def create_event(nid, event, isSpec=False):
     """
     Add *event* to the list of events for notebook *nid*. Optional argument
@@ -594,11 +614,8 @@ def reorder_events(evid1, evid2, nid):
         else:
             seqs.append(seq)
 
-    print seqs
     seqs[0], seqs[1] = seqs[1], seqs[0]
-    print seqs
     for i in range(len(evids)):
-        print seqs[i][0][0], evids[i]
         cursor.execute('UPDATE events SET sequence=? WHERE evid=?', (seqs[i][0][0], evids[i]))
     return True
 

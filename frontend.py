@@ -329,25 +329,38 @@ def events_screen(ntype=None, nnum=None):
             delete_event(events, specials)
         elif c == 'r':
             ev1, ev2 = None, None
-            print ""
             while True:
-                ev1 = termdisplay.ask_input("Event to reposition:")
-                try: ev1 = int(ev1)
-                except ValueError:
-                    print "Use event numbers to select events to reposition."
-                    continue
-                else: break
-            while True:
-                ev2 = termdisplay.ask_input("Swap with:", True)
-                try: ev2 = int(ev2)
-                except ValueError:
-                    print "Use event numbers to select events to reposition."
-                    continue
-                else: break
+                print ""
+                while True:
+                    ev1 = termdisplay.ask_input("Event to reposition:")
+                    try: ev1 = int(ev1)
+                    except ValueError:
+                        print "Use event numbers to select events to reposition."
+                        continue
+                    else:
+                        evid1 = evDict[ev1][0]
+                        isSpec1 = backend.isSpecial(evid1)
+                        break
 
-            evid1 = evDict[ev1][0]
-            evid2 = evDict[ev2][0]
-            backend.reorder_events(evid1, evid2, nid)
+                while True:
+                    ev2 = termdisplay.ask_input("Swap with:", True)
+                    try: ev2 = int(ev2)
+                    except ValueError:
+                        print "Use event numbers to select events to reposition."
+                        continue
+                    else:
+                        evid2 = evDict[ev2][0]
+                        isSpec2 = backend.isSpecial(evid2)
+                        break
+
+                if isSpec1 is None or isSpec2 is None:
+                    termdisplay.warn("Something went wrong -- one of those "
+                                     "events doesn't exist.")
+                elif (isSpec1 and not isSpec2) or (isSpec2 and not isSpec1):
+                    print "You cannot swap a special and non-special event."
+                else:
+                    backend.reorder_events(evid1, evid2, nid)
+                    break
         elif c == 's':
             backend.connection.commit()
             print "\b\b\bSaved."

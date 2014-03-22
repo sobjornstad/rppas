@@ -407,7 +407,6 @@ def notebooks_screen():
         elif c == 'e':
             print ""
             r = edit_notebook()
-            return
         elif c == 'd':
             delete_notebook()
         elif c == 'f':

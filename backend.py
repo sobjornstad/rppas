@@ -550,6 +550,13 @@ def zero_pad(i, ntype):
 
     return i
 
+def unzero_pad(s):
+    """
+    Remove any leading zeroes from the argument string and return modified
+    string. Dead simple.
+    """
+
+    return s.lstrip('0')
 
 def import_from_base(filename):
     """
@@ -747,12 +754,10 @@ def fetch_notebook_events(nid):
 initialize()
 
 if __name__ == "__main__":
+    s = "4"
+    s = zero_pad(s, "CB")
+    print s
+    s = unzero_pad(s)
+    print s
     pass
-    create_event(1, "Soren is alive.", False)
-    rewrite_event(3, 1, "Soren is STILL alive!", True)
-    print get_evid("Soren is alive.", 1)
-    events, specials = fetch_notebook_events(1)
-    print "events are:\n%r" % events
-    print "specials are:\n%r" % specials
-
     cleanup()

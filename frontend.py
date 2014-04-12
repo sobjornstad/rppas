@@ -64,9 +64,9 @@ def lookup_action(search):
                         termdisplay.colors.ENDC
             if loopcount == 0:
                 # ntype, nnum, pagenum
-                print formatStr % (i[0], i[1], i[2]),
+                print formatStr % (i[0], i[1], backend.unzero_pad(i[2])),
             else:
-                print "\b, " + formatStr % (i[0], i[1], i[2]),
+                print "\b, " + formatStr % (i[0], i[1], backend.unzero_pad(i[2])),
 
             charcount += 2 # for the comma and space
             loopcount += 1
@@ -109,7 +109,7 @@ def nearby():
     #TODO: Ranges can cause tabbing to look ugly
     if results:
         for i in results:
-            print formatStr % (ntype, int(nnum), i[0], i[1])
+            print formatStr % (ntype, int(nnum), backend.unzero_pad(i[0]), i[1])
     else:
         print "No results."
 

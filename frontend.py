@@ -214,12 +214,14 @@ def search_events(search=None):
             print ""
             continue
 
-def search_screen(search=None):
+def search_screen(search=None, substrfilters=[]):
     """
     Screen that allows the user to search for index entries matching a query,
     then optionally run a lookup, When was, or Nearby.
 
     Optional argument: the search to run. Otherwise the user will be asked.
+    Second optional argument: one or more substrings to also require in the
+    entries, to be used as a sort of search-within-a-search ("filter").
     """
 
     termdisplay.print_title()
@@ -227,16 +229,26 @@ def search_screen(search=None):
         search = termdisplay.ask_input("Search:")
     else:
         termdisplay.fake_input("Search:", search)
-    results, matches = backend.search_entries(search)
+        # display list of current filters below
+        filtersString = ''
+        for i in substrfilters:
+            filtersString += i
+            filtersString += ', '
+        filtersString = filtersString[:-2]
+        if filtersString:
+            termdisplay.fake_input("Filter:", filtersString)
+
+    results, matches = backend.search_entries(search, substrfilters)
     if matches:
         for i in matches:
             print "%i:\t%s" % (i, matches[i])
     else:
         print "No results."
 
-    keys = ['L', 'S', 'N', 'W', 'V', 'R', 'Q']
-    commands = {'L':'Lookup', 'S':'Search again', 'N':'Nearby',
-                'W':'When was', 'V': 'Search events', 'R':'Reload', 'Q':'Quit'}
+    keys = ['L', 'S', 'F', 'U', 'N', 'W', 'V', 'R', 'Q']
+    commands = {'L':'Lookup', 'S':'Search again', 'F':'Filter', 'U':'Unfilter',
+                'N':'Nearby', 'W':'When was', 'V': 'Search events',
+                'R':'Reload', 'Q':'Quit'}
     termdisplay.print_commands(keys, commands, '')
 
     while True:
@@ -246,20 +258,29 @@ def search_screen(search=None):
             print ""
             lookup_by_number(matches)
         elif c == 's':
-            search_screen()
+            search_screen(substrfilters=[])
+            return
+        elif c == 'f':
+            print ""
+            newFilter = termdisplay.ask_input("Filter:")
+            substrfilters.append(newFilter)
+            search_screen(search, substrfilters)
+            return
+        elif c == 'u':
+            search_screen(search, [])
             return
         elif c == 'w':
             when_was()
-            search_screen(search)
+            search_screen(search, substrfilters)
             return
         elif c == 'n':
             nearby()
         elif c == 'v':
             search_events(search)
-            search_screen(search)
+            search_screen(search, substrfilters)
             return
         elif c == 'r':
-            search_screen(search)
+            search_screen(search, substrfilters)
             return
         elif c == 'q':
             # even if we run search several times, we only want to press q once

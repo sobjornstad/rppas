@@ -392,7 +392,7 @@ def search_events(search):
     else:
         return len(matches), matches
 
-def search_entries(search):
+def search_entries(search, substrfilters=[]):
     """
     Given a search string, find entries containing that substring.
 
@@ -404,12 +404,23 @@ def search_entries(search):
     number and the program can pull out the text of the entry using the
     dictionary, then use get_entry_eid to find EIDs and look up occurrences by
     that.
+
+    Optional argument: a list of additional substring filters or "subsearches"
+    to search within the search.
     """
 
     search = "%" + search + "%"
-    cursor.execute('SELECT name FROM entries \
-                    WHERE name LIKE ? \
-                    ORDER BY name', (search,))
+    query = 'SELECT name FROM entries ' \
+            'WHERE name LIKE ? '
+    if substrfilters:
+        for i in range(len(substrfilters)):
+            query += "AND name LIKE ? "
+            if not (substrfilters[i][0] == '%' and substrfilters[i][0] == '%'):
+                substrfilters[i] = "%" + substrfilters[i] + "%"
+
+    query += 'ORDER BY name'
+    params = [search] + substrfilters
+    cursor.execute(query, params)
 
     matches = {}
     matchnum = 1
@@ -589,7 +600,9 @@ def get_evid(event, nid=None):
             print ntype + str(nnum) + ",",
         print "\b\b \n"
         while True:
+            # only need number, as only CBs have events
             sel = ask_input("Select number of notebook to use:")
+
             # verify user's selection is actually right
             try: sel = int(sel)
             except ValueError: continue

@@ -357,6 +357,11 @@ def events_screen(ntype=None, nnum=None):
                  # keep the table of books displayed the first time
     needsUserInput = True if (ntype == None and nnum == None) else False
 
+    if not needsUserInput and ntype != 'CB':
+        # events are only a thing for CBs
+        termdisplay.warn("Tried to open events for a non-CB notebook!")
+        return False
+
     while True:
         if first:
             first = False
@@ -365,8 +370,8 @@ def events_screen(ntype=None, nnum=None):
             termdisplay.print_title()
 
         if needsUserInput:
-            ntype = termdisplay.ask_input("Type to view:")
-            nnum = termdisplay.ask_input("Number to view:", extended=True)
+            ntype = 'CB'
+            nnum = termdisplay.ask_input("CB number to view:", extended=True)
 
         nid = backend.get_nid(ntype, nnum)
         if nid == 0:

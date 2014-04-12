@@ -1,6 +1,5 @@
 - Ability to add entries
 - Split things up into modules by unit worked with: notebooks, entries, etc.
-- Don't allow opening entries for non-CB notebooks
 
 FEATURE REQUESTS
   (from self)

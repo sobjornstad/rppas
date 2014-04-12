@@ -4,6 +4,7 @@ import getpass
 import signal
 import sys
 from config import PASSWORD, VALID_YEAR_RANGE, NOTEBOOK_TYPES, NOTEBOOK_SIZES
+from termdisplay import ask_input
 
 ### FULL-DATABASE OPERATIONS ###
 
@@ -365,13 +366,39 @@ def lookup(search):
     matches = fetch_occurrences(eid)
     return matches
 
+def search_events(search):
+    """
+    Given a search string, find events containing that substring. Quite similar
+    to search_entries.
+
+    Returns a dictionary:
+    - KEYS: numerical IDs (to be displayed and used to select)
+    - VALUES: events (as strings)
+    """
+
+    search = "%" + search + "%"
+    cursor.execute('SELECT event FROM events \
+                    WHERE event LIKE ? \
+                    ORDER BY nid, event', (search,))
+
+    matches = {}
+    matchnum = 1
+    for match in cursor.fetchall():
+        matches[matchnum] = match[0]
+        matchnum += 1
+
+    if not matches:
+        return 0, None
+    else:
+        return len(matches), matches
+
 def search_entries(search):
     """
     Given a search string, find entries containing that substring.
 
-    Returns a dictionary:
-    - KEYS: numerical IDs (to be displayed and used to select)
-    - VALUES: entries (as strings)
+    Returns a tuple of the number of matches, as well as a dictionary:
+        - KEYS: numerical IDs (to be displayed and used to select)
+        - VALUES: entries (as strings)
 
     To look up occurrences for one of the entries, then, the user can enter a
     number and the program can pull out the text of the entry using the
@@ -536,21 +563,55 @@ def import_from_base(filename):
     connection.commit()
 
 ### EVENTS ###
-def get_evid(event, nid):
+def get_evid(event, nid=None):
     """
     Given an event description and notebook, return the event ID, or None if it
     doesn't exist.
+
+    There's the risk of having identical events across multiple notebooks and
+    messing everything up, so when possible provide the nid. When it isn't
+    provided, a little self-check will let the user select which one if
+    necessary.
     """
 
-    cursor.execute('SELECT evid FROM events WHERE event = ? AND nid = ?', (event,nid))
+    if nid:
+        cursor.execute('SELECT evid FROM events WHERE event = ? AND nid = ?', (event,nid))
+    else:
+        cursor.execute('SELECT evid FROM events WHERE event = ?', (event,))
     evid = cursor.fetchall()
     if not evid:
         return None
     elif len(evid) > 1:
-        # this is unlikely to happen, but just in case, say something
-        termdisplay.warn("Multiple events in notebook " + str(nid) + " with the same name!")
+        print "Multiple events with the same name!"
+        print "Notebooks:",
+        for i in evid:
+            ntype, nnum = get_notebook_info(i[0], "ntype, nnum")
+            print ntype + str(nnum) + ",",
+        print "\b\b \n"
+        while True:
+            sel = ask_input("Select number of notebook to use:")
+            # verify user's selection is actually right
+            try: sel = int(sel)
+            except ValueError: continue
+            if (sel,) not in evid: continue
+            else: return sel
     else:
         return evid[0][0]
+
+def event_notebook(evid):
+    """
+    Given an evid, find what notebook it is in.
+
+    Argument: the evid. Return: the nid.
+    """
+
+    cursor.execute('SELECT nid FROM events WHERE evid = ?', (evid,))
+    nid = cursor.fetchall()
+    print nid
+    if not nid:
+        return None
+    else:
+        return nid[0][0]
 
 def isSpecial(evid):
     """

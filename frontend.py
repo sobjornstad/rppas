@@ -139,6 +139,81 @@ def when_was():
     nid = backend.get_nid(ntype, nnum)
     events_screen(ntype, nnum)
 
+def lookup_event(matches, key=None):
+    if not key:
+        key = termdisplay.ask_input("Number to look up: ")
+        try: key = int(key)
+        except ValueError:
+            print "Invalid lookup value!"
+            lookup_event(matches)
+            return
+
+    try: evid = backend.get_evid(matches[key])
+    except IndexError:
+        print "Invalid lookup value!"
+        lookup_event(matches)
+    else:
+        nid = backend.event_notebook(evid)
+        ntype, nnum = backend.get_notebook_info(nid, "ntype, nnum")
+        events_screen(ntype, nnum)
+
+def search_events(search=None):
+    """
+    Mostly the same code as search_screen, but searches events rather than
+    index entries. Optional argument for search to run.
+    """
+
+    termdisplay.print_title()
+    if not search:
+        search = termdisplay.ask_input("Event search:")
+    else:
+        termdisplay.fake_input("Event search:", search)
+    results, matches = backend.search_events(search)
+    if matches:
+        for i in matches:
+            print "%i:\t%s" % (i, matches[i])
+    else:
+        print "No results."
+
+    keys = ['L', 'S', 'R', 'Q']
+    commands = {'L':'Lookup', 'S':'Search again', 'R':'Reload', 'Q':'Quit'}
+    termdisplay.print_commands(keys, commands, '')
+
+    while True:
+        termdisplay.entry_square()
+        c = getch().lower()
+        if c == 'l':
+            print ""
+            lookup_event(matches)
+            search_events(search)
+            return
+        elif c == 's':
+            search_events()
+            return
+        elif c == 'r':
+            search_events(search)
+            return
+        elif c == 'q':
+            return
+        elif c == '\x03': # ctrl-c
+            backend.sigint_handler()
+        elif c in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
+            # simply look up that item
+            print ""
+            try:
+                c = int(c)
+            except:
+                print "Invalid lookup number."
+            if c > len(matches):
+                print "Invalid lookup number."
+            else:
+                lookup_event(matches, c)
+                search_events(search)
+                return
+        else:
+            print ""
+            continue
+
 def search_screen(search=None):
     """
     Screen that allows the user to search for index entries matching a query,
@@ -159,9 +234,9 @@ def search_screen(search=None):
     else:
         print "No results."
 
-    keys = ['L', 'S', 'N', 'W', 'R', 'Q']
+    keys = ['L', 'S', 'N', 'W', 'V', 'R', 'Q']
     commands = {'L':'Lookup', 'S':'Search again', 'N':'Nearby',
-                'W':'When was', 'R':'Reload', 'Q':'Quit'}
+                'W':'When was', 'V': 'Search events', 'R':'Reload', 'Q':'Quit'}
     termdisplay.print_commands(keys, commands, '')
 
     while True:
@@ -171,16 +246,21 @@ def search_screen(search=None):
             print ""
             lookup_by_number(matches)
         elif c == 's':
-            r = search_screen()
+            search_screen()
             return
         elif c == 'w':
             when_was()
-            r = search_screen(search)
+            search_screen(search)
             return
         elif c == 'n':
             nearby()
+        elif c == 'v':
+            search_events(search)
+            search_screen(search)
+            return
         elif c == 'r':
             search_screen(search)
+            return
         elif c == 'q':
             # even if we run search several times, we only want to press q once
             return

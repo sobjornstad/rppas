@@ -3,6 +3,7 @@
 import ui.termdisplay
 import database
 import notebooks
+import events
 
 ### EVENTS ###
 def get_evid(event, nid=None):

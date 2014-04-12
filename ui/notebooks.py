@@ -6,6 +6,8 @@ import config
 from time import sleep
 import db.notebooks
 import db.utilities
+import events
+import db.database
 
 def add():
     """
@@ -175,7 +177,7 @@ def screen():
             while True:
                 print ""
                 dat = termdisplay.ask_input("Open at:")
-                if backend.valid_date(dat):
+                if db.utilities.valid_date(dat):
                     break
                 else:
                     print "Invalid date!"
@@ -183,16 +185,16 @@ def screen():
         elif c == 'c':
             dopened, dclosed, dat, filtered = None, None, None, None
         elif c == 'v':
-            events_screen()
+            events.screen()
         elif c == 's':
-            backend.connection.commit()
+            db.database.connection.commit()
             print "\b\b\bSaved."
             sleep(0.5)
         elif c == 'u':
-            backend.connection.rollback()
+            db.database.connection.rollback()
             print "\b\b\b\bUndone."
             sleep(0.5)
         elif c == 'q':
             return
         elif c == '\x03': # ctrl-c
-            backend.sigint_handler()
+            db.utilities.sigint_handler()

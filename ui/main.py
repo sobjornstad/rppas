@@ -38,6 +38,6 @@ def screen():
             f = termdisplay.ask_input("Filename:")
             db.importing.from_base(f)
         elif c == 'q' or c == '\x03': # ctrl-c
-            database.cleanup()
+            db.database.cleanup()
         else:
             continue

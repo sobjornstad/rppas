@@ -135,10 +135,10 @@ def screen(ntype=None, nnum=None):
         c = getch().lower()
         if c == 'a':
             print ""
-            add_event(nid)
+            add(nid)
         elif c == 'd':
             print ""
-            delete_event(events, specials)
+            delete(events, specials)
         elif c == 'r':
             ev1, ev2 = None, None
             while True:
@@ -178,7 +178,7 @@ def screen(ntype=None, nnum=None):
             print "\b\b\bSaved."
             sleep(0.5)
         elif c == 'u':
-            db.backend.connection.rollback()
+            db.database.connection.rollback()
             print "\b\b\b\bUndone."
             sleep(0.5)
         elif c == 'b':

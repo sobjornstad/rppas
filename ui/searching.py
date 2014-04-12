@@ -240,7 +240,7 @@ def search_screen(search=None, substrfilters=[]):
         if filtersString:
             termdisplay.fake_input("Filter:", filtersString)
 
-    results, matches = db.search.entries(search, substrfilters)
+    results, matches = db.search.Entries(search, substrfilters)
     if matches:
         for i in matches:
             print "%i:\t%s" % (i, matches[i])

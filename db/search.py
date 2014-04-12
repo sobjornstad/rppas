@@ -11,7 +11,7 @@ def lookup(search):
     (ntype, nnum, page). Return None if there are no matches.
     """
 
-    eid = events.get_eid(search)
+    eid = entries.get_eid(search)
     if not eid:
         return
 
@@ -44,7 +44,7 @@ def events(search):
     else:
         return len(matches), matches
 
-def entries(search, substrfilters=[]):
+def Entries(search, substrfilters=[]):
     """
     Given a search string, find entries containing that substring.
 
@@ -65,6 +65,7 @@ def entries(search, substrfilters=[]):
     query = 'SELECT name FROM entries ' \
             'WHERE name LIKE ? '
     if substrfilters:
+        substrfilters = substrfilters[:] # don't modify outside this function
         for i in range(len(substrfilters)):
             query += "AND name LIKE ? "
             if not (substrfilters[i][0] == '%' and substrfilters[i][0] == '%'):

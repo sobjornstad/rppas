@@ -1,15 +1,6 @@
-- nearby() doesn't work with digit boundaries: CB13.9 finds nothing because
-  nothing comes between '8' and '10' alphabetically. This can be fixed with
-  mandatory leading 0's, but once again the TB problem comes up -- leading
-  zeroes there is kind of annoying. Maybe that latter problem can be solved by
-  handling and not displaying the leading 0's.
-
-- Ability to add entries (do events first so the DB structure is done I think).
-
+- Don't display leading 0's.
+- Ability to add entries
 - Split things up into modules by unit worked with: notebooks, entries, etc.
-
-REMAINING THINGS TO IMPLEMENT IN EVENTS
-- Figure out how to fit searching for events in.
 
 FEATURE REQUESTS
   (from self)
@@ -24,5 +15,3 @@ FEATURE REQUESTS
 - Allow some keystroke (^C? Esc?) to cancel an active search/whatever.
 
 - Allow the entry of simply "CB6" or so instead of separate type and num entry fields.
-
-- Allow searching within a search (this could be quite tricky).

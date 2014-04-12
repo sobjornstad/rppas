@@ -107,6 +107,7 @@ def get_nid(ntype, nnum):
     elif len(results) == 0:
         return 0
     else:
+        termdisplay.warn("Multiple notebooks with same type and number!")
         return -1
 
 def dump_notebooks():
@@ -224,6 +225,9 @@ def check_exact_match(number, pageLow, pageHigh):
     allow if one of them matches.
 
     Return True if this match should be kept, False if it should be deleted.
+
+    This function is deprecated after the inclusion of forced zero padding, as
+    it adds a mostly needless check.
     """
 
     acceptable_matches = number.split('-') # one-element list if not a range
@@ -249,15 +253,19 @@ def occurrences_around(ntype, nnum, page, margin=1):
     """
 
     # find the nid of the notebook containing the entry we're looking at
-    cursor.execute('SELECT nid FROM notebooks WHERE ntype = ? AND nnum= ?', (ntype, nnum))
-    nid = cursor.fetchall()[0][0]
+    nid = get_nid(ntype, nnum)
 
     # what page range are we looking at?
     pageLow = page - margin
     pageHigh = page + margin
 
+    # pad with leading zeroes to let this feature work with low numbers
+    pageLow = zero_pad(str(pageLow), ntype)
+    pageHigh = zero_pad(str(pageHigh), ntype)
+
     # find occurrences in same notebook with similar pages; surprisingly,
-    # BETWEEN works perfectly on strings, and even finds ranges
+    # BETWEEN works perfectly on strings, and even finds ranges (on the high
+    # end only)
     cursor.execute('SELECT eid, page FROM occurrences \
                     WHERE nid = ? AND page BETWEEN ? AND ?',\
                     (nid, pageLow, pageHigh))
@@ -270,13 +278,14 @@ def occurrences_around(ntype, nnum, page, margin=1):
         results.append((i[1], cursor.fetchall()[0][0]))
         counter += 1
 
+    # The following is DEPRECATED due to leading zero enforcement
     # Some of these results might not be correct. For instance, searching
     # around '6' gets you 5, 6, 7 (correctly), but also 50-70. Remove any that
     # are wrong. (Leading zero enforcement should prevent this, but this should
     # head off any number of possible sort/between bugs.)
-    for i in results[:]:
-        if not check_exact_match(i[0], pageLow, pageHigh):
-            results.remove(i)
+    #for i in results[:]:
+    #    if not check_exact_match(i[0], pageLow, pageHigh):
+    #        results.remove(i)
 
     # I don't have the slightest idea what this is doing, but it implements the
     # sort I want: first by page number, then alphabetically (non-case-

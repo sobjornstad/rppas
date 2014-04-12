@@ -1,5 +1,6 @@
 - Ability to add entries
 - Split things up into modules by unit worked with: notebooks, entries, etc.
+- Don't allow deleting a notebook without deleting its events.
 
 FEATURE REQUESTS
   (from self)

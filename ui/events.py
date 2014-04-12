@@ -150,7 +150,10 @@ def screen(ntype=None, nnum=None):
                         print "Use event numbers to select events to reposition."
                         continue
                     else:
-                        evid1 = evDict[ev1][0]
+                        try: evid1 = evDict[ev1][0]
+                        except KeyError:
+                            print "Invalid event number.\n"
+                            continue
                         isSpec1 = db.events.isSpecial(evid1)
                         break
 
@@ -161,7 +164,10 @@ def screen(ntype=None, nnum=None):
                         print "Use event numbers to select events to reposition."
                         continue
                     else:
-                        evid2 = evDict[ev2][0]
+                        try: evid2 = evDict[ev2][0]
+                        except KeyError:
+                            print "Invalid event number.\n"
+                            continue
                         isSpec2 = db.events.isSpecial(evid2)
                         break
 

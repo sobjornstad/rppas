@@ -100,7 +100,7 @@ def delete():
             print "Invalid number!"
             continue
         if nid == 0:
-            print "Notebook does not exist!"
+            print "Notebook does not exist!\n"
         else:
             break
 

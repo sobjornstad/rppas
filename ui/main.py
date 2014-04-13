@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import termdisplay
-from termdisplay import getch
-import searching
-import notebooks
-import db.importing
 import db.database
+import db.importing
+import notebooks
+import searching
+import termdisplay
 
 def screen():
     """
@@ -27,7 +26,7 @@ def screen():
         termdisplay.print_title()
         termdisplay.print_commands(keys, commands, '  Main')
         termdisplay.entry_square()
-        c = getch().lower()
+        c = termdisplay.getch().lower()
 
         if c == 's':
             searching.search_screen()

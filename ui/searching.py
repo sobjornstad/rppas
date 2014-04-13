@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import termdisplay
-from termdisplay import getch
 import db.search
-import db.utilities
 import db.entries
-import db.notebooks
-import events
 import db.events
+import db.notebooks
+import db.utilities
+import events
+import termdisplay
 
 def lookup_by_number(results):
     """
@@ -186,7 +185,7 @@ def search_events_screen(search=None):
 
     while True:
         termdisplay.entry_square()
-        c = getch().lower()
+        c = termdisplay.getch().lower()
         if c == 'l':
             print ""
             lookup_event(matches)
@@ -255,7 +254,7 @@ def search_screen(search=None, substrfilters=[]):
 
     while True:
         termdisplay.entry_square()
-        c = getch().lower()
+        c = termdisplay.getch().lower()
         if c == 'l':
             print ""
             lookup_by_number(matches)

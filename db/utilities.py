@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from config import PASSWORD, VALID_YEAR_RANGE, NOTEBOOK_TYPES, NOTEBOOK_SIZES
-import notebooks
 import ui.termdisplay
 import database
+import notebooks
 
 def valid_date(date, unlimited_years=False):
     """

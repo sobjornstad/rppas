@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import database
+import entries
 import notebooks
 import utilities
-import entries
 
 def get_eid(entry):
     """Given an entry's name, return its eid, or None if entry does not exist."""

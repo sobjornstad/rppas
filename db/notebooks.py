@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import database
 import ui.termdisplay
+import database
 import notebooks
 
 def get_nid(ntype, nnum):

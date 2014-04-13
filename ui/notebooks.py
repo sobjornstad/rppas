@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import termdisplay
-from termdisplay import getch
-import config
 from time import sleep
+import db.database
 import db.notebooks
 import db.utilities
+import config
 import events
-import db.database
+import termdisplay
 
 def add():
     """
@@ -58,7 +57,7 @@ def edit():
     if nid == 0:
         print "Error -- no matches."
         termdisplay.entry_square()
-        getch()
+        termdisplay.getch()
         return
 
     dopened, dclosed = db.notebooks.get_info(nid, "dopened, dclosed")
@@ -154,7 +153,7 @@ def screen():
         termdisplay.print_commands(keys, commands, '')
         termdisplay.entry_square()
 
-        c = getch().lower()
+        c = termdisplay.getch().lower()
         if c == 'a':
             add()
         elif c == 'e':

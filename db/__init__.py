@@ -3,8 +3,8 @@
 import getpass
 import signal
 from config import PASSWORD
-import database
 import ui.main
+import database
 import utilities
 
 def access_control():

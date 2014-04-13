@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import textwrap
 from time import sleep
 import config
-import termdisplay
-from termdisplay import getch
-import textwrap
 import db.events
 import db.notebooks
 import db.database
+import termdisplay
 
 def add(nid):
     event = termdisplay.ask_input("Event name:", extended=True)
@@ -26,7 +25,7 @@ def add(nid):
     if not ok:
         print "Whoops, that event already exists!"
         termdisplay.entry_square()
-        getch()
+        termdisplay.getch()
 
 def delete(events, specials):
     """
@@ -132,7 +131,7 @@ def screen(ntype=None, nnum=None):
         termdisplay.print_commands(keys, commands, '')
 
         termdisplay.entry_square()
-        c = getch().lower()
+        c = termdisplay.getch().lower()
         if c == 'a':
             print ""
             add(nid)

@@ -1,20 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import ui.termdisplay
 import database
 import entries
 import notebooks
 import utilities
 
-def get_eid(entry):
-    """Given an entry's name, return its eid, or None if entry does not exist."""
-
-    database.cursor.execute('SELECT eid FROM entries WHERE name = ?;', (entry,))
-    eid = database.cursor.fetchall()
-    if eid:
-        return eid[0][0]
-    else:
-        return None
-
+### OCCURRENCES ###
 def occurrences_around(ntype, nnum, page, margin=1):
     """
     Find other entries that are used on the same or a nearby page.
@@ -77,11 +69,12 @@ def add_occurrence(entry, ntype, nnum, pagenum):
     Return True if it works, False if the occurrence already existed.
     """
 
-    #TODO: We should modify this to check for the notebook not existing
-
     # get notebook ID
     database.cursor.execute('SELECT nid FROM notebooks WHERE ntype = ? AND nnum = ?', (ntype, nnum))
     nid = database.cursor.fetchall()[0][0]
+    if not nid:
+        termdisplay.warn("That notebook does not exist!")
+        return False
 
     # get entry eid if entry exists; add it if it does not
     eid = entries.get_eid(entry)
@@ -126,3 +119,31 @@ def fetch_occurrences(eid):
     # we can mitigate this by requiring leading zeroes when adding
     matches.sort()
     return matches
+
+### ENTRIES ###
+def get_eid(entry):
+    """Given an entry's name, return its eid, or None if entry does not exist."""
+
+    database.cursor.execute('SELECT eid FROM entries WHERE name = ?;', (entry,))
+    eid = database.cursor.fetchall()
+    if eid:
+        return eid[0][0]
+    else:
+        return None
+
+def correct_entry(entry, new_entry):
+    """
+    Modify the text of an entry to correct typos or the like.
+    Arguments: the current text of the entry to change and the new value for the text.
+    """
+
+    database.cursor.execute('UPDATE entries SET name = ? WHERE name = ?',
+                            (new_entry, entry))
+
+def delete_entry(eid):
+    """
+    Delete an entry and any associated occurrences.
+    """
+
+    database.cursor.execute('DELETE FROM occurrences WHERE eid = ?', (eid,))
+    database.cursor.execute('DELETE FROM entries WHERE eid = ?', (eid,))

@@ -1,5 +1,8 @@
 - Ability to add entries
 - Don't allow deleting a notebook without deleting its events.
+- Fix case-sensitive ordering of entries returned.
+
+- Coalesce
 
 FEATURE REQUESTS
   (from self)

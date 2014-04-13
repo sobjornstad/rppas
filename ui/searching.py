@@ -6,6 +6,7 @@ import db.events
 import db.notebooks
 import db.utilities
 import events
+import editing
 import termdisplay
 
 def lookup_by_number(results):
@@ -246,10 +247,10 @@ def search_screen(search=None, substrfilters=[]):
     else:
         print "No results."
 
-    keys = ['L', 'S', 'F', 'U', 'N', 'W', 'V', 'R', 'Q']
+    keys = ['L', 'S', 'F', 'U', 'N', 'W', 'V', 'E', 'R', 'Q']
     commands = {'L':'Lookup', 'S':'Search again', 'F':'Filter', 'U':'Unfilter',
                 'N':'Nearby', 'W':'When was', 'V': 'Search events',
-                'R':'Reload', 'Q':'Quit'}
+                'E':'Edit entry', 'R':'Reload', 'Q':'Quit'}
     termdisplay.print_commands(keys, commands, '')
 
     while True:
@@ -278,6 +279,15 @@ def search_screen(search=None, substrfilters=[]):
             nearby()
         elif c == 'v':
             search_events_screen(search)
+            search_screen(search, substrfilters)
+            return
+        elif c == 'e':
+            print ""
+            entryNum = termdisplay.ask_input("Entry to edit:")
+            try: editing.screen(matches[int(entryNum)])
+            except ValueError:
+                print "Invalid lookup number."
+                continue
             search_screen(search, substrfilters)
             return
         elif c == 'r':

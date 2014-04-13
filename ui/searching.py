@@ -31,7 +31,7 @@ def lookup_by_number(results):
         if (not results):
             print "Invalid lookup number."
             return
-        elif ( (index > (len(results) - 1)) or (index < 1) ):
+        elif ( (index > len(results)) or (index < 1) ):
             print "Invalid lookup number."
             return
         else:
@@ -303,11 +303,10 @@ def search_screen(search=None, substrfilters=[]):
 
             if (not matches):
                 print "Invalid lookup number."
-            elif ( c > (len(matches)-1) ) or ( c < 1 ):
+            elif ( c > len(matches) ) or ( c < 1 ):
                 print "Invalid lookup number."
             else:
                 lookup_action(matches[c])
         else:
             print ""
             continue
-

@@ -1,10 +1,11 @@
 - Ability to add entries
-- Split things up into modules by unit worked with: notebooks, entries, etc.
 - Don't allow deleting a notebook without deleting its events.
 
 FEATURE REQUESTS
   (from self)
 ----------------
+
+- Allow when_was queries to work on TBs
 
 - search_entries() - this is also a frontend thing - Allow a "starts with"
   search, like the STO directory, for things like "UI" and "IT" that are often

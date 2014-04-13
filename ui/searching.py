@@ -146,7 +146,7 @@ def when_was():
 
 def lookup_event(matches, key=None):
     if not key:
-        key = termdisplay.ask_input("Number to look up: ")
+        key = termdisplay.ask_input("Number to look up:")
         try: key = int(key)
         except ValueError:
             print "Invalid lookup value!"
@@ -180,8 +180,8 @@ def search_events_screen(search=None):
     else:
         print "No results."
 
-    keys = ['L', 'S', 'R', 'Q']
-    commands = {'L':'Lookup', 'S':'Search again', 'R':'Reload', 'Q':'Quit'}
+    keys = ['L', 'S', 'Q']
+    commands = {'L':'Lookup', 'S':'Search again', 'Q':'Quit'}
     termdisplay.print_commands(keys, commands, '')
 
     while True:
@@ -189,14 +189,11 @@ def search_events_screen(search=None):
         c = getch().lower()
         if c == 'l':
             print ""
-            db.events.lookup(matches)
+            lookup_event(matches)
             search_events_screen(search)
             return
         elif c == 's':
             search_events_screen()
-            return
-        elif c == 'r':
-            search_events_screen(search)
             return
         elif c == 'q':
             return
@@ -281,7 +278,7 @@ def search_screen(search=None, substrfilters=[]):
         elif c == 'n':
             nearby()
         elif c == 'v':
-            search_events(search)
+            search_events_screen(search)
             search_screen(search, substrfilters)
             return
         elif c == 'r':

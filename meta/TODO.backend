@@ -2,8 +2,6 @@
 - Don't allow deleting a notebook without deleting its events.
 - Fix case-sensitive ordering of entries returned.
 
-- Coalesce
-
 - Delete an individual occurrence (goes in edit entries menu)
 
 FEATURE REQUESTS

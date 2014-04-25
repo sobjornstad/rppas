@@ -140,6 +140,36 @@ def correct_entry(entry, new_entry):
     database.cursor.execute('UPDATE entries SET name = ? WHERE name = ?',
                             (new_entry, entry))
 
+def coalesce_entry(from_entry, to_entry, redir=True):
+    """
+    Combine two entries by moving all the occurrences from the 'from' into the
+    'to', then creating a "moved to" occurrence and changing the 'from' entry
+    to point to that.
+
+    Arguments: the 'from' and 'to' entries. Make sure they both exist first.
+    Optional argument: redir. If True, we will leave a "moved to" message at
+    the 'from' entry; otherwise we will wipe the 'from' entry from the database
+    entirely.
+    """
+
+    # gather all needed information before we start changing anything
+    from_eid = entries.get_eid(from_entry)
+    to_eid = entries.get_eid(to_entry)
+    if redir:
+        occ_list = fetch_occurrences(from_eid)
+        from_ntype, from_nnum, from_page = occ_list[0]
+        from_pagenum = "moved to " + to_entry.upper()
+
+    # make changes
+    database.cursor.execute('UPDATE occurrences SET eid = ? WHERE eid = ?',
+                            (to_eid, from_eid))
+    database.cursor.execute('DELETE FROM occurrences WHERE eid = ?',
+                            (from_eid,))
+    if redir:
+        add_occurrence(from_entry, from_ntype, from_nnum, from_pagenum)
+    else:
+        delete_entry(from_eid)
+
 def delete_entry(eid):
     """
     Delete an entry and any associated occurrences.

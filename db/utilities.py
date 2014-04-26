@@ -98,7 +98,8 @@ def zero_pad(i, ntype):
         elif NOTEBOOK_SIZES[ntype] <= 999:
             i = '0' + i
     elif len(i) == 1:
-        assert ntype in NOTEBOOK_TYPES
+        assert ntype in NOTEBOOK_TYPES, "invalid ntype %r, valids %r" % \
+                (ntype, NOTEBOOK_TYPES)
         if NOTEBOOK_SIZES[ntype] <= 99:
             i = '0' + i
         elif NOTEBOOK_SIZES[ntype] <= 999:

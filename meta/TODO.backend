@@ -3,6 +3,10 @@
 - Fix case-sensitive ordering of entries returned.
 
 - Delete an individual occurrence (goes in edit entries menu)
+- Possibility of striking the add of a set of pages. Similarly, have /strike
+  undo all of the things added in one go with commas, rather than just one.
+- Autocreate notebook if adding and it doesn't exist?
+- Autosave entries if ^C is pressed at that screen.
 
 FEATURE REQUESTS
   (from self)

@@ -2,6 +2,7 @@
 
 import db.database
 import db.importing
+import adding
 import notebooks
 import searching
 import termdisplay
@@ -12,14 +13,14 @@ def screen():
     familiar with the concept of a main menu, get out.
     """
 
-    keys = ['S', 'P', 'E', 'N', 'I', 'X', 'Q']
+    keys = ['S', 'P', 'A', 'N', 'I', 'X', 'Q']
     commands = {'S':'Search',
                 'P':'Print Index',
-                'Q':'Quit',
+                'A':'Add Entries',
                 'N':'Notebooks',
-                'E':'Edit Entries',
-                'X':'Export',
                 'I':'Import',
+                'X':'Export',
+                'Q':'Quit',
                }
 
     while True:
@@ -32,6 +33,8 @@ def screen():
             searching.search_screen()
         elif c == 'n':
             notebooks.screen()
+        elif c == 'a':
+            adding.screen()
         elif c == 'i':
             print ""
             f = termdisplay.ask_input("Filename:")

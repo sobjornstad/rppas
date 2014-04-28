@@ -78,7 +78,6 @@ def processPages(page, ntype):
             i = i.strip()
             i = db.utilities.zero_pad(i, ntype)
             finishedPages.append(i)
-        print finishedPages
         return finishedPages
     else:
         # single entry

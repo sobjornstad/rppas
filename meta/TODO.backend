@@ -8,6 +8,9 @@
 - Autocreate notebook if adding and it doesn't exist?
 - Autosave entries if ^C is pressed at that screen.
 
+- Filters are not cleared on leaving the search screen and can come back to
+  haunt future searches.
+
 FEATURE REQUESTS
   (from self)
 ----------------

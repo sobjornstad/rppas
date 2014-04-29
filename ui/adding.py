@@ -122,7 +122,7 @@ def getNotebook():
         print ""
         ntype = termdisplay.ask_input("Type:")
         nnum = termdisplay.ask_input("Number:", extended=True)
-        if ntype not in config.NOTEBOOK_TYPES:
+        if ntype.upper() not in config.NOTEBOOK_TYPES:
             print "Invalid notebook type!"
             continue
         try: nnum = int(nnum)

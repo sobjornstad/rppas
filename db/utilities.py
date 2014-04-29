@@ -66,7 +66,7 @@ def validate_location(ntype, nnum, pagenum=None):
     """
 
     # make sure notebook exists
-    if ntype not in NOTEBOOK_TYPES:
+    if ntype.upper() not in NOTEBOOK_TYPES:
         return False
     if type(nnum) != int:
         return False

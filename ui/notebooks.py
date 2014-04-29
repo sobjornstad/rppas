@@ -16,7 +16,7 @@ def add():
     while True:
         print ""
         ntype = termdisplay.ask_input("Type to add:")
-        if ntype not in config.NOTEBOOK_TYPES:
+        if ntype.upper() not in config.NOTEBOOK_TYPES:
             print "Invalid notebook type!"
         else:
             break
@@ -85,7 +85,7 @@ def delete():
     while True:
         print ""
         ntype = termdisplay.ask_input("Type to delete:")
-        if ntype not in config.NOTEBOOK_TYPES:
+        if ntype.upper() not in config.NOTEBOOK_TYPES:
             print "Invalid notebook type!"
         else:
             break

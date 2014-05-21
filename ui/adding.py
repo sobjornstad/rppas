@@ -33,7 +33,7 @@ class additionQueue:
         for i in pageList:
             self.entries.append((entry,i))
 
-        if len(self.entries) > 5:
+        if len(self.entries) >= 5:
             self.dump()
 
     def validatePages(self, entry):
@@ -47,19 +47,16 @@ class additionQueue:
         print "Added: %r" % (self.history)
         self.showQueue()
 
-    def dump(self, final=False):
+    def dump(self):
         """
-        Save queue to the database. In order to maintain undoability, we don't
-        save the very final entry to disk unless 'final=True' is set (used before
-        quitting). Then commit the changes.
+        Save queue to the database, then commit the changes. If there is
+        nothing in the queue, do nothing.
 
         State change: Update self.entries with the new list.
         """
 
         if not self.entries:
             return
-        if not final:
-            lastEntry = self.entries.pop()
 
         for i in self.entries[:]:
             entry, pagenum = self.entries.pop()
@@ -68,38 +65,41 @@ class additionQueue:
             db.entries.add_occurrence(entry, ntype, nnum, pagenum)
 
         db.database.connection.commit()
-        if not final:
-            self.entries = [lastEntry]
-        else:
-            self.entries = []
 
     def strike(self, number=1):
         """
         Remove the last item(s) from the queue, if the queue has any items.
         """
+        #TODO: Catch in case user accidentally types e.g. "/strike 500"
 
         for i in range(number):
             if self.entries:
                 print "Removed %s.\n" % (self.entries[-1][0]),
                 del self.entries[-1]
-#            elif self.history:
-#                # actually run the database delete command
-#                # for this we need to add a delete_occurrence function
-#                print "Removed %s.\n" % (self.history[-1][0]),
-#                del self.history[-1]
+            elif self.history:
+                print "Removed %s (from history).\n" % (self.history[-1][0]),
+                self.strike_from_history()
             else:
                 print "Nothing more to be struck."
                 break
 
+    def strike_from_history(self):
+        """
+        Delete the last item from the history list, then remove it from said
+        list.
+        """
+
+        entry, pagenum = self.history[-1]
+        eid = db.entries.get_eid(entry)
+        db.database.cursor.execute('DELETE FROM occurrences WHERE eid = ?'
+                                'AND page = ?', (eid, pagenum))
+        self.history.pop()
+
 
 def screen():
     """
-    Screen for adding entries to the list.
-
-    We save every time the list reaches 6 elements, but only save the first
-    five of them. This way, we always preserve the ability to undo at least one
-    item (if it hasn't saved, we can undo an indefinite number up to before the
-    save).
+    Screen for adding entries to the list. We save every time the list reaches
+    5 elements, when we quit, or on user request.
     """
 
     nid = getNotebook()
@@ -144,7 +144,7 @@ def screen():
                     queue.strike()
 
         elif entry == "/quit":
-            queue.dump(final=True)
+            queue.dump()
             break
         else:
             page = termdisplay.ask_input("Page:", extended=True)

@@ -59,7 +59,7 @@ class additionQueue:
             return
 
         for i in self.entries[:]:
-            entry, pagenum = self.entries.pop()
+            entry, pagenum = self.entries.pop(0)
             self.history.append((entry,pagenum))
             ntype, nnum = db.notebooks.get_info(self.nid, "ntype, nnum")
             db.entries.add_occurrence(entry, ntype, nnum, pagenum)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import config
 import sqlite3 as sqlite
 import sys
 
@@ -13,7 +14,7 @@ def initialize():
     """
 
     global connection, cursor
-    connection = sqlite.connect("records.db")
+    connection = sqlite.connect(config.DATABASE_FILENAME)
     connection.text_factory = str # fix for some weird Unicode error
     cursor = connection.cursor()
     print "database initialized"

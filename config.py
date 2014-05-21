@@ -1,3 +1,6 @@
+# where the database file is
+DATABASE_FILENAME = "test.db"
+
 # how wide to optimize the display for
 SCREEN_WIDTH = 80
 

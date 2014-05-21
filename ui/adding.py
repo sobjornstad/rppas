@@ -7,6 +7,79 @@ import db.utilities
 import config
 import termdisplay
 
+#TODO: Some of this should really go into the db side
+
+class additionQueue:
+    """
+    Represents a queue of entries to be added to the database. Handles storing,
+    validation, and writing of the entries.
+    """
+
+    def __init__(self, nid):
+        self.entries = []
+        self.nid = nid
+        self.ntype = db.notebooks.get_info(self.nid, "ntype")[0]
+
+    def add(self, entry, page):
+        """
+        Add entry,page pairs to the database (passed as separate arguments).
+        This method only updates the state of the object, not the actual
+        database, though it is responsible for calling the dump method when
+        the queue is "full."
+        """
+
+        pageList = processPages(page, self.ntype)
+        for i in pageList:
+            self.entries.append((entry,i))
+
+        if len(self.entries) > 5:
+            self.dump()
+
+    def validatePages(self, entry):
+        pass
+
+    def showQueue(self):
+        print "Queue: %r" % (self.entries)
+
+    def dump(self, final=False):
+        """
+        Save queue to the database. In order to maintain undoability, we don't
+        save the very final entry to disk unless 'final=True' is set (used before
+        quitting).
+
+        State change: Update self.entries with the new list.
+        """
+
+        if not self.entries:
+            return
+        if not final:
+            lastEntry = self.entries.pop()
+
+        for i in self.entries[:]:
+            entry, pagenum = self.entries.pop()
+            ntype, nnum = db.notebooks.get_info(self.nid, "ntype, nnum")
+            db.entries.add_occurrence(entry, ntype, nnum, pagenum)
+
+        db.database.connection.commit()
+        if not final:
+            self.entries = [lastEntry]
+        else:
+            self.entries = []
+
+    def strike(self, number=1):
+        """
+        Remove the last item(s) from the queue, if the queue has any items.
+        """
+
+        for i in range(number):
+            if self.entries:
+                print "Removed %s.\n" % (self.entries[-1][0]),
+                del self.entries[-1]
+            else:
+                print "Nothing more to be struck."
+                break
+
+
 def screen():
     """
     Screen for adding entries to the list.
@@ -20,41 +93,46 @@ def screen():
     nid = getNotebook()
     if not nid:
         return
+    else:
+        queue = additionQueue(nid)
 
     print "Enter /help for information about adding commands."
-    entries = []
     while True:
         print ""
         entry = termdisplay.ask_input("Entry:")
 
         if entry == "/help":
             print "Available commands:"
-            print "/help   - show this help screen"
-            print "/save   - save entries now"
-            print "/show   - show entries in queue"
-            print "/strike - remove previous entry"
-            print "/quit   - stop adding entries"
+            print "/help       - show this help screen"
+            print "/save       - save entries now"
+            print "/show       - show entries in queue"
+            print "/strike [#] - remove previous entry(ies)"
+            print "/quit       - stop adding entries"
         elif entry == "/save":
-            entries = saveEntries(entries, nid)
+            queue.dump()
         elif entry == "/show":
-            print "Queue: %r" % entries
-        elif entry == "/strike":
-            if entries:
-                print "Removed %s.\n" % (entries[-1][0])
-                del entries[-1]
+            queue.showQueue()
+        elif entry.startswith("/strike"):
+            if entry == "/strike": # no params
+                queue.strike()
             else:
-                print "Nothing to be struck."
+                parts = entry.split(' ')
+                if len(parts) > 1:
+                    try:
+                        parts[1] = int(parts[1])
+                    except ValueError: # not an int; ignore parameter
+                        queue.strike()
+                    else:
+                        queue.strike(parts[1])
+                else: # no parameter given
+                    queue.strike()
+
         elif entry == "/quit":
-            saveEntries(entries, nid, final=True)
+            queue.dump(final=True)
             break
         else:
             page = termdisplay.ask_input("Page:", extended=True)
-            ntype = db.notebooks.get_info(nid, "ntype")[0]
-            pageList = processPages(page, ntype)
-            for i in pageList:
-                entries.append((entry,i))
-            if len(entries) > 5:
-                entries = saveEntries(entries, nid)
+            queue.add(entry, page)
 
 def processPages(page, ntype):
     """
@@ -85,32 +163,6 @@ def processPages(page, ntype):
         page = db.utilities.zero_pad(page, ntype)
         return [page]
 
-def saveEntries(entries, nid, final=False):
-    """
-    Given a list of recent entries and the nid for the notebook we're adding
-    to, save them to the database. In order to maintain undoability, we don't
-    save the very final entry to disk unless 'final=True' is set (used before
-    quitting).
-
-    Return the list that was passed in, with elements that were saved removed.
-    """
-
-    if not entries:
-        return []
-
-    if not final:
-        lastEntry = entries.pop()
-
-    for i in entries[:]:
-        entry, pagenum = entries.pop()
-        ntype, nnum = db.notebooks.get_info(nid, "ntype, nnum")
-        db.entries.add_occurrence(entry, ntype, nnum, pagenum)
-
-    db.database.connection.commit()
-    if not final:
-        return [lastEntry]
-    else:
-        return []
 
 def getNotebook():
     """

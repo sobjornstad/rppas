@@ -71,6 +71,7 @@ class additionQueue:
         Remove the last item(s) from the queue, if the queue has any items.
         """
         #TODO: Catch in case user accidentally types e.g. "/strike 500"
+        # create a termdisplay function called "warnyn" or um
 
         for i in range(number):
             if self.entries:
@@ -92,7 +93,10 @@ class additionQueue:
         entry, pagenum = self.history[-1]
         eid = db.entries.get_eid(entry)
         db.database.cursor.execute('DELETE FROM occurrences WHERE eid = ?'
-                                'AND page = ?', (eid, pagenum))
+                                   'AND page = ?', (eid, pagenum))
+        if not db.entries.fetch_occurrences(eid): # no other occurrences
+            db.entries.delete_entry(eid)
+
         self.history.pop()
 
 

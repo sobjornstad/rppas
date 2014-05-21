@@ -17,6 +17,7 @@ class additionQueue:
 
     def __init__(self, nid):
         self.entries = []
+        self.history = []
         self.nid = nid
         self.ntype = db.notebooks.get_info(self.nid, "ntype")[0]
 
@@ -41,11 +42,16 @@ class additionQueue:
     def showQueue(self):
         print "Queue: %r" % (self.entries)
 
+    def showHistory(self):
+        #TODO: A way to specify you only want to see the last x entries, like with tail
+        print "Added: %r" % (self.history)
+        self.showQueue()
+
     def dump(self, final=False):
         """
         Save queue to the database. In order to maintain undoability, we don't
         save the very final entry to disk unless 'final=True' is set (used before
-        quitting).
+        quitting). Then commit the changes.
 
         State change: Update self.entries with the new list.
         """
@@ -57,6 +63,7 @@ class additionQueue:
 
         for i in self.entries[:]:
             entry, pagenum = self.entries.pop()
+            self.history.append((entry,pagenum))
             ntype, nnum = db.notebooks.get_info(self.nid, "ntype, nnum")
             db.entries.add_occurrence(entry, ntype, nnum, pagenum)
 
@@ -75,6 +82,11 @@ class additionQueue:
             if self.entries:
                 print "Removed %s.\n" % (self.entries[-1][0]),
                 del self.entries[-1]
+#            elif self.history:
+#                # actually run the database delete command
+#                # for this we need to add a delete_occurrence function
+#                print "Removed %s.\n" % (self.history[-1][0]),
+#                del self.history[-1]
             else:
                 print "Nothing more to be struck."
                 break
@@ -104,14 +116,18 @@ def screen():
         if entry == "/help":
             print "Available commands:"
             print "/help       - show this help screen"
+            print "/history    - show list of added entries"
             print "/save       - save entries now"
-            print "/show       - show entries in queue"
             print "/strike [#] - remove previous entry(ies)"
+            print "/queue      - show unsaved entries"
             print "/quit       - stop adding entries"
+            #TODO: Run a search from here (to edit or whatnot)
         elif entry == "/save":
             queue.dump()
-        elif entry == "/show":
+        elif entry == "/queue":
             queue.showQueue()
+        elif entry == "/history":
+            queue.showHistory()
         elif entry.startswith("/strike"):
             if entry == "/strike": # no params
                 queue.strike()

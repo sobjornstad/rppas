@@ -1,7 +1,21 @@
 #!/usr/bin/env python
 
+VER_NUM = "0.1.0"
+
 import sys
+import time
 sys.path.insert(0, '/home/soren/current/recordsprojectindex/rpi')
 import db
 import ui
+import config
+
+print "Records Project Paper Augmentation System, version " + VER_NUM
+print "Copyright (c) 2014 Soren Bjornstad. See COPYING for license details."
+if config.IS_PRODUCTION:
+    print "Warning: This is a PRODUCTION database!"
+    raw_input("(Press Return to start program)")
+else:
+    print "This is a TEST database."
+    time.sleep(0.4)
+
 ui.main.screen()

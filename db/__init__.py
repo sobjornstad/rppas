@@ -5,7 +5,7 @@
 # make sure we have a config file first; some of the other imports need it too
 try:
     from config import PASSWORD
-except:
+except ImportError:
     print "Whoops! You don't have a configuration file!"
     print "To correct this, rename the default 'config.py.DEFAULT' file"
     print "to 'config.py' and edit it as desired, then start the program again."

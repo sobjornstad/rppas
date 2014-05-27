@@ -1,6 +1,16 @@
 # This is the default configuration file for RPPAS. Edit it as you like.
+
+# This file is imported by the Python interpreter, so you can write things that
+# are conditional based on earlier settings or other conditions, if you like.
+# Nothing will ever look for a name in this file that is not in all caps, so if
+# you'd like to add your own variables, just avoid those.
+
 # This file is not under any kind of copyright or license restrictions.
 
+
+# if true, display a warning that you're editing your actual data file rather
+# than a programming test file
+IS_PRODUCTION = False
 
 # where the database file is
 DATABASE_FILENAME = "records.db"

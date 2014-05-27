@@ -1,4 +1,5 @@
 The Records Project Paper Augmentation System (RPPAS)
+Version 0.1.0
 
 == Dependencies ==
 The only dependency likely to give you any trouble is sqlite3.

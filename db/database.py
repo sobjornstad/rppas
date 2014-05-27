@@ -19,7 +19,6 @@ def initialize():
     connection = sqlite.connect(config.DATABASE_FILENAME)
     connection.text_factory = str # fix for some weird Unicode error
     cursor = connection.cursor()
-    print "database initialized"
 
 def cleanup():
     """Commit any remaining changes and quit program. Obviously no return."""

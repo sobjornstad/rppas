@@ -7,6 +7,8 @@ notebooks. It is specifically designed for the way I use my notebooks, but might
 be useful to others either to use directly or as a starting point for
 customization to meet their own requirements.
 
+This is the manual for version 0.1.0.
+
 Features
 ========
 

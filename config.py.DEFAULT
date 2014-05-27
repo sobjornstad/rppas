@@ -1,3 +1,7 @@
+# This is the default configuration file for RPPAS. Edit it as you like.
+# This file is not under any kind of copyright or license restrictions.
+
+
 # where the database file is
 DATABASE_FILENAME = "records.db"
 

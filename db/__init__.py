@@ -1,8 +1,19 @@
 # -*- coding: utf-8 -*-
+# Copyright (c) 2014 Soren Bjornstad <contact@sorenbjornstad.com>
+# License: GNU AGPL, version 3 or later; see COPYING for details
+
+# make sure we have a config file first; some of the other imports need it too
+try:
+    from config import PASSWORD
+except:
+    print "Whoops! You don't have a configuration file!"
+    print "To correct this, rename the default 'config.py.DEFAULT' file"
+    print "to 'config.py' and edit it as desired, then start the program again."
+    import sys
+    sys.exit(1)
 
 import getpass
 import signal
-from config import PASSWORD
 import ui.main
 import database
 import utilities

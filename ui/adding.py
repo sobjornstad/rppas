@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+# Copyright (c) 2014 Soren Bjornstad <contact@sorenbjornstad.com>
+# License: GNU AGPL, version 3 or later; see COPYING for details
+
 import db.database
 import db.entries
 import db.notebooks

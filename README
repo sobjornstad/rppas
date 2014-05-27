@@ -1,0 +1,16 @@
+The Records Project Paper Augmentation System (RPPAS)
+
+== Dependencies ==
+The only dependency likely to give you any trouble is sqlite3.
+
+== Installing ==
+Nothing needs to be installed as long as you have Python and sqlite3. You do
+need to create a configuration file and database before you can use the
+program, however; for that, refer to the manual in the docs/ directory.
+
+== Documentation =
+There is a full manual in the docs/ directory.
+
+== Contact ==
+You can email me with questions, comments, or suggestions at
+contact@sorenbjornstad.com.

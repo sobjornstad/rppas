@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# Copyright (c) 2014 Soren Bjornstad <contact@sorenbjornstad.com>
+# License: GNU AGPL, version 3 or later; see COPYING for details
 
 from config import PASSWORD, VALID_YEAR_RANGE, NOTEBOOK_TYPES, NOTEBOOK_SIZES
 import ui.termdisplay

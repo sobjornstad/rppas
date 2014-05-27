@@ -13,16 +13,18 @@ def access_control():
     encrypted and the password is stored in plaintext in config.py; this is
     just a fast way to keep out casual meddlers.
 
-    While working on the program, you probably want to comment the call out at
-    the bottom of this file.
+    If PASSWORD is set to nothing in config.py, automatically continue.
 
     Exits the program if the password is not correct; no return.
     """
+
+    if not PASSWORD:
+        return
 
     pw = getpass.getpass("Password: ")
     if pw != PASSWORD:
         exit()
 
-#access_control() # comment this out while testing to avoid needing PW
+access_control()
 signal.signal(signal.SIGINT, utilities.sigint_handler)
 database.initialize()

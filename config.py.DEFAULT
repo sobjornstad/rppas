@@ -1,18 +1,18 @@
 # where the database file is
-DATABASE_FILENAME = "test.db"
+DATABASE_FILENAME = "records.db"
 
-# how wide to optimize the display for
+# how many columns to optimize the display for
 SCREEN_WIDTH = 80
 
 # the title displayed at the top of the screen
 TITLE = "  Records Project Paper Augmentation Software"
 
 # the password needed to access the software
-PASSWORD = 'Mauddie'
+PASSWORD = ''
 
 # the years between which you could reasonably be alive and have records to search
 VALID_YEAR_RANGE = (1990, 2100)
 
 # notebook setup
 NOTEBOOK_TYPES = ['CB', 'TB', 'DB']
-NOTEBOOK_SIZES = {'CB': 80, 'TB': 240, 'DB': 240}
+NOTEBOOK_SIZES = {'CB': 80, 'TB': 240, 'DB': 240} # in pages

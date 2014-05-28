@@ -1,0 +1,69 @@
+Items are roughly prioritized with the most important things at the top of each
+list.
+
+BUGFIXES
+========
+
+- Don't allow deleting a notebook without deleting its events.
+- Fix duplicate event handling
+- Autosave entries if ^C is pressed at that screen.
+- Fix case-sensitive ordering of entries returned.
+- Filters are not cleared on leaving the search screen and can come back to
+  haunt future searches. (Hmm, they appeared to last time I checked...do I mean
+  that they come back if you press filter again?)
+
+INTERNAL WORK
+=============
+
+- Create classes for occurrences, entries, and events, to clean things up a
+  bit. Maybe a few other ones will prove useful, too, like the adding queue one
+  I made already.
+- Go through and look at all the #TODO's, and see what needs to be done there.
+
+NEW FEATURES
+============
+
+Things that could cause data loss problems, or annoyance
+--------------------------------------------------------
+
+- Prevent use of "abbreviated" ranges like "25-6"
+- Automatically put leading 0's in ranges
+- Allow some keystroke (^C? Esc?) to cancel an active search/whatever.
+- Implement validation of page numbers when adding entries
+- Similarly, don't allow blank entries or page numbers
+
+Other new features
+------------------
+
+- Allow the entry of simply "CB6" or so instead of separate type and num entry
+- Don't make ntype entries case-sensitive.
+- Default to non-special events, so you can press Enter for them
+- Autocreate notebook if adding and it doesn't exist?
+
+- Delete an individual occurrence (goes in edit entries menu)
+- Start an add from the edit screen
+- Start a search from the add screen
+
+- Allow when_was queries to work on TBs
+- Printing list/exporting.
+- Have some way for /strike to undo all of the things added in one go with
+  commas, rather than just one.
+- search_entries(): Allow a "starts with" search, like the STO directory, for
+  things like "UI" and "IT" that are often substrings. Maybe a case-sensitive
+  option too? Regexes?
+
+- See if I can get readline?
+    - If readline works (and maybe even if it doesn't), repeat the above entry
+      (and maybe with it back one level of ,'s)
+    - Also if readline works, editing of events
+    - Also, a /strike command that only knocks out the page? If we get a
+      readline(), we can do all sorts of better things here
+
+- Filter index by date; add an option to the events screen to pull up index for
+  that set of dates
+    - Consider two-column command boxes to save space on this screen in
+      particular
+        - And some sort of scrolling for the events screen
+
+- Allow multiple fields in a line and tab between them, for Where was's and
+  stuff.

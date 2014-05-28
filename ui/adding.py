@@ -128,7 +128,6 @@ def screen():
             print "/strike [#] - remove previous entry(ies)"
             print "/queue      - show unsaved entries"
             print "/quit       - stop adding entries"
-            #TODO: Run a search from here (to edit or whatnot)
         elif entry == "/save":
             queue.dump()
         elif entry == "/queue":

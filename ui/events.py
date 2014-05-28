@@ -46,8 +46,10 @@ def delete(bothlist):
             print "Enter the number of the item to delete."
         else:
             break
-    bothlist[todel - 1].delete()
-    # don't need to delete from the list because the list is rebuilt on
+
+    bothlist[todel - 1].delete() # - 1 because counter starts at 1
+
+    # we don't need to delete from the list itself because it's rebuilt on
     # returning to the events list
 
 def screen(ntype=None, nnum=None):
@@ -164,17 +166,20 @@ def reposition(bothlist, nid):
     while True:
         print ""
         while True:
-            #TODO: In both these, prevent user entering 0
             ev1 = termdisplay.ask_input("Event to reposition:")
-            try: ev1 = int(ev1)
+            try:
+                ev1 = int(ev1)
             except ValueError:
                 print "Use event numbers to select events to reposition."
                 print ""
                 continue
             else:
                 try:
+                    if (ev1 - 1) < 0:
+                        # would select from end of list
+                        raise IndexError
                     Event1 = bothlist[ev1 - 1]
-                except (KeyError, IndexError):
+                except IndexError:
                     print "Invalid event number.\n"
                     continue
                 isSpec1 = Event1.isSpecial()
@@ -182,15 +187,18 @@ def reposition(bothlist, nid):
 
         while True:
             ev2 = termdisplay.ask_input("Swap with:", True)
-            try: ev2 = int(ev2)
+            try:
+                ev2 = int(ev2)
             except ValueError:
                 print "Use event numbers to select events to reposition."
                 print ""
                 continue
             else:
                 try:
+                    if (ev2 - 1) < 0:
+                        raise IndexError
                     Event2 = bothlist[ev2 - 1]
-                except (KeyError, IndexError):
+                except IndexError:
                     print "Invalid event number.\n"
                     continue
                 isSpec2 = Event2.isSpecial()

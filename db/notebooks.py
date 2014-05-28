@@ -50,6 +50,11 @@ def create(ntype, nnum, opend, closed):
 
 def delete(nid):
     """Delete the notebook with specified nid from database. No return."""
+    # first the occurrences
+    # then the entries associated with those
+    # finally, the events in this notebook
+
+    # then we can do the notebook itself
     database.cursor.execute('DELETE FROM notebooks WHERE nid=?', (nid,))
 
 def dump():

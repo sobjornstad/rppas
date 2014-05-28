@@ -24,21 +24,19 @@ def add(nid):
             print "Please type 'y' or 'n'.\n"
 
     ok = db.events.create(nid, event, isSpecial)
-    if not ok:
+    if ok is None:
         print "Whoops, that event already exists!"
         termdisplay.entry_square()
         termdisplay.getch()
 
-def delete(events, specials):
+def delete(bothlist):
     """
     Ask for the key number to delete and remove it from the database.
 
-    Arguments: The events and specials dictionaries storing the current state
-               of events (no pun intended).
+    Argument: The bothlist list containing the current state of events (no
+              pun intended) and specials.
     Return: None.
     """
-
-    events.update(specials)
 
     while True:
         todel = termdisplay.ask_input("Number to delete:")
@@ -48,8 +46,9 @@ def delete(events, specials):
             print "Enter the number of the item to delete."
         else:
             break
-    evid_todel = events[todel][0]
-    db.events.delete(evid_todel)
+    bothlist[todel - 1].delete()
+    # don't need to delete from the list because the list is rebuilt on
+    # returning to the events list
 
 def screen(ntype=None, nnum=None):
     """
@@ -90,41 +89,34 @@ def screen(ntype=None, nnum=None):
     while True:
         termdisplay.print_title()
         dopened, dclosed = db.notebooks.get_info(nid, "dopened, dclosed")
-        events, specials, eventsOrder, specialsOrder = \
-                db.events.fetch_in_notebook(nid)
+        events, specials = db.events.fetch_in_notebook(nid)
+        bothlist = events + specials # for later reference
 
-        # switch to using a user-friendly numeric listing, but save the evid
-        counter = 1
-        newEvents, newSpecials = {}, {}
-        for i in range(len(eventsOrder)):
-            newEvents[counter] = (eventsOrder[i], events[eventsOrder[i]])
-            counter += 1
-        for i in range(len(specialsOrder)):
-            newSpecials[counter] = (specialsOrder[i], specials[specialsOrder[i]])
-            counter += 1
-        events, specials = newEvents, newSpecials
-        evDict = dict(events.items() + specials.items()) # for looking up evids
-
-        # output list of events
+        # output screen header
         print termdisplay.center("Events for %s%s%s%s" % (
             termdisplay.colors.GREEN, ntype, nnum, termdisplay.colors.ENDC))
         print termdisplay.center("  %s%s%s – %s%s%s" % (
             termdisplay.colors.WHITE, dopened, termdisplay.colors.RED,
             termdisplay.colors.WHITE, dclosed, termdisplay.colors.ENDC))
 
+        # output events list
+        counter = 1
         print termdisplay.colors.BLUE + "\nEvents:" + termdisplay.colors.ENDC
         for i in events:
-            lines = textwrap.wrap(events[i][1], config.SCREEN_WIDTH - 8)
-            print "%i:\t%s" % (i, lines.pop(0))
+            lines = textwrap.wrap(i.getText(), config.SCREEN_WIDTH - 8)
+            print "%i:\t%s" % (counter, lines.pop(0))
             for line in lines:
                 print "   \t%s" % line
+            counter += 1
 
+        # counter continues for specials
         print termdisplay.colors.BLUE + "\nSpecials:" + termdisplay.colors.ENDC
         for i in specials:
-            lines = textwrap.wrap(specials[i][1], config.SCREEN_WIDTH - 8)
-            print "%i:\t%s" % (i, lines.pop(0))
+            lines = textwrap.wrap(i.getText(), config.SCREEN_WIDTH - 8)
+            print "%i:\t%s" % (counter, lines.pop(0))
             for line in lines:
                 print "   \t%s" % line
+            counter += 1
 
         keys = ['A', 'D', 'R', 'S', 'U', 'B', '+', '-', 'Q']
         commands = {'A':'Add', 'D':'Delete', 'R':'Reposition',
@@ -139,47 +131,9 @@ def screen(ntype=None, nnum=None):
             add(nid)
         elif c == 'd':
             print ""
-            delete(events, specials)
+            delete(bothlist)
         elif c == 'r':
-            ev1, ev2 = None, None
-            while True:
-                print ""
-                while True:
-                    ev1 = termdisplay.ask_input("Event to reposition:")
-                    try: ev1 = int(ev1)
-                    except ValueError:
-                        print "Use event numbers to select events to reposition."
-                        continue
-                    else:
-                        try: evid1 = evDict[ev1][0]
-                        except KeyError:
-                            print "Invalid event number.\n"
-                            continue
-                        isSpec1 = db.events.isSpecial(evid1)
-                        break
-
-                while True:
-                    ev2 = termdisplay.ask_input("Swap with:", True)
-                    try: ev2 = int(ev2)
-                    except ValueError:
-                        print "Use event numbers to select events to reposition."
-                        continue
-                    else:
-                        try: evid2 = evDict[ev2][0]
-                        except KeyError:
-                            print "Invalid event number.\n"
-                            continue
-                        isSpec2 = db.events.isSpecial(evid2)
-                        break
-
-                if isSpec1 is None or isSpec2 is None:
-                    termdisplay.warn("Something went wrong -- one of those "
-                                     "events doesn't exist.")
-                elif (isSpec1 and not isSpec2) or (isSpec2 and not isSpec1):
-                    print "You cannot swap a special and non-special event."
-                else:
-                    db.events.reorder(evid1, evid2, nid)
-                    break
+            reposition(bothlist, nid)
         elif c == 's':
             db.database.connection.commit()
             print "\b\b\bSaved."
@@ -204,3 +158,49 @@ def screen(ntype=None, nnum=None):
         else:
             print ""
             continue
+
+def reposition(bothlist, nid):
+    ev1, ev2 = None, None
+    while True:
+        print ""
+        while True:
+            #TODO: In both these, prevent user entering 0
+            ev1 = termdisplay.ask_input("Event to reposition:")
+            try: ev1 = int(ev1)
+            except ValueError:
+                print "Use event numbers to select events to reposition."
+                print ""
+                continue
+            else:
+                try:
+                    Event1 = bothlist[ev1 - 1]
+                except (KeyError, IndexError):
+                    print "Invalid event number.\n"
+                    continue
+                isSpec1 = Event1.isSpecial()
+                break
+
+        while True:
+            ev2 = termdisplay.ask_input("Swap with:", True)
+            try: ev2 = int(ev2)
+            except ValueError:
+                print "Use event numbers to select events to reposition."
+                print ""
+                continue
+            else:
+                try:
+                    Event2 = bothlist[ev2 - 1]
+                except (KeyError, IndexError):
+                    print "Invalid event number.\n"
+                    continue
+                isSpec2 = Event2.isSpecial()
+                break
+
+        if isSpec1 is None or isSpec2 is None:
+            termdisplay.warn("Something went wrong -- one of those "
+                             "events doesn't exist.")
+        elif (isSpec1 and not isSpec2) or (isSpec2 and not isSpec1):
+            print "You cannot swap a special and non-special event."
+        else:
+            db.events.reorder(Event1, Event2, nid)
+            break

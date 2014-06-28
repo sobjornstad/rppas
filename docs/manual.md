@@ -9,6 +9,29 @@ customization to meet their own requirements.
 
 This is the manual for version 0.1.0.
 
+While the RPPAS itself is licensed under the GPL, this manual is under *no
+copyright* and may be used in any way for any purpose whatsoever without the
+need to ask for permission.
+
+<hr>
+<center>
+<p xmlns:dct="http://purl.org/dc/terms/">
+  <a rel="license"
+     href="http://creativecommons.org/publicdomain/zero/1.0/">
+    <img src="http://i.creativecommons.org/p/zero/1.0/88x31.png" style="border-style: none;" alt="CC0" />
+  </a>
+  <br />
+  To the extent possible under law,
+  <a rel="dct:publisher"
+     href="http://sorenbjornstad.com">
+    <span property="dct:title">Soren Bjornstad</span></a>
+  has waived all copyright and related or neighboring rights to the
+  <span property="dct:title">Records Project Paper Augmentation System manual</span>.
+</p>
+</center>
+<hr>
+
+
 Features
 ========
 
@@ -349,8 +372,8 @@ entry.
 
 After entering the information, you'll be given a list of entries that have
 occurrences on the page number you entered or the one right before or after it.
-In many ways this is like a reverse lookup: the occurrences are found and the
-entries associated with them displayed.
+In many ways this is like a reverse lookup: the occurrences are already known,
+and the entries associated with them displayed.
 
 If you want to look a little bit further forward or backward than *nearby*
 provides you with, you can always re-run the nearby command on a page number

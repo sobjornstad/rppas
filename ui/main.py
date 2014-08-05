@@ -37,6 +37,9 @@ def screen():
             notebooks.screen()
         elif c == 'a':
             adding.screen()
+        elif c == 'p':
+            import exporting
+            exporting.printAllEntries()
         elif c == 'i':
             print ""
             f = termdisplay.ask_input("Filename:")

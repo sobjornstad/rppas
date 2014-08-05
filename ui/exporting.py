@@ -8,6 +8,7 @@ import subprocess
 import db.search
 import db.entries
 from db.utilities import unzero_pad
+from config import NOTEBOOK_TYPES
 
 def formatEntries(elist):
     """Given a list of entries, format them for export."""
@@ -37,16 +38,33 @@ def munge_latex(s):
 
     # ampersands
     s = s.replace('&', '\\&')
+
     # italicize titles &c
     if "__" in s:
         s = re.sub("\\\\textbf{(.*)__(.*)}", "\\\\textbf{\emph{\\1}\\2}", s)
     # we could have typoes or other uses that result in single underscores
     s = s.replace('_', '\\textunderscore')
+
     # move opening quote to start of line
     if '""' in s:
-        print "found quotes"
         s = re.sub('\\\\textbf{(.*)""(.*)}', '\\\\textbf{``\\1"\\2}', s)
 
+    # small-capify notebook names
+    for nbuname in NOTEBOOK_TYPES:
+        if nbuname in s:
+            s = re.sub('%s' % nbuname, '{\\\\scshape %s\,}' % nbuname.lower(), s)
+
+    # reformat 'see' entries with smallcaps and colons
+    for redir in ['see', 'moved to', 'see also', 'also see']:
+        if ''.join(['.', redir]) in s:
+            s = re.sub(".%s (.*)" % redir, ": %s{\\\\scshape\ \\1}" % redir, s)
+            repl = re.findall(": %s.*" % redir, s)
+            repl = repl[0]
+            repl.replace(": %s", "")
+            s = s.replace(repl, repl.lower())
+
+    # use en-dash in ranges; might grab a few wrong things; maybe worth it
+    s = s.replace('-', '--')
     return s
 
 def printAllEntries():
@@ -57,7 +75,8 @@ def printAllEntries():
     DOC_STARTSTR = """\\documentclass{article}
 \\usepackage[margin=0.5in, landscape]{geometry}
 \\usepackage[utf8x]{inputenc}
-\\usepackage[columns=4, indentunit=0.8em, columnsep=1em, font=footnotesize, justific=raggedright, rule=0.5pt]{idxlayout}
+\\usepackage[columns=5, indentunit=0.75em, columnsep=0.5em, font=footnotesize, justific=raggedright, rule=0.5pt]{idxlayout}
+\\usepackage[sc,osf]{mathpazo}
 \\begin{document}
 \\begin{theindex}\n"""
     DOC_ENDSTR = """\\end{theindex}

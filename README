@@ -2,9 +2,14 @@ The Records Project Paper Augmentation System (RPPAS)
 Version 0.1.0
 
 == Dependencies ==
-The only dependency likely to give you any trouble is sqlite3.
+Required to use the program:
+- sqlite3
+- pyparsing
 
-Also pyparsing
+To use the "print index" feature, you will need:
+- A working copy of LaTeX.
+- The following packages: utf8x, geometry, idxlayout, mathpazo, lastpage,
+  fancyhdr.
 
 == Installing ==
 Nothing needs to be installed as long as you have Python and sqlite3. You do

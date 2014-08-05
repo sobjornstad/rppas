@@ -11,6 +11,7 @@ BUGFIXES
 - Filters are not cleared on leaving the search screen and can come back to
   haunt future searches. (Hmm, they appeared to last time I checked...do I mean
   that they come back if you press filter again?)
+- /strike doesn't seem to need the '/' to work?
 
 INTERNAL WORK
 =============

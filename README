@@ -4,6 +4,8 @@ Version 0.1.0
 == Dependencies ==
 The only dependency likely to give you any trouble is sqlite3.
 
+Also pyparsing
+
 == Installing ==
 Nothing needs to be installed as long as you have Python and sqlite3. You do
 need to create a configuration file and database before you can use the

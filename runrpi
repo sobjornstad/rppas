@@ -4,7 +4,6 @@ VER_NUM = "0.1.1"
 
 import sys
 import time
-sys.path.insert(0, '/home/soren/current/recordsprojectindex/rpi')
 import db
 import ui
 import config

@@ -73,10 +73,18 @@ def printAllEntries():
     entr = formatEntries(elist)
 
     DOC_STARTSTR = """\\documentclass{article}
-\\usepackage[margin=0.5in, landscape]{geometry}
+\\usepackage[top=0.9in, bottom=0.8in, left=0.5in, right=0.5in, headsep=0in, landscape]{geometry}
 \\usepackage[utf8x]{inputenc}
 \\usepackage[columns=5, indentunit=0.75em, columnsep=0.5em, font=footnotesize, justific=raggedright, rule=0.5pt]{idxlayout}
 \\usepackage[sc,osf]{mathpazo}
+\\usepackage{fancyhdr}
+\\fancyhf{}
+\\pagestyle{fancy}
+\\renewcommand{\\headrulewidth}{0.5pt}
+\\fancyhead[LO,LE]{\\scshape The Complete Records Project Index}
+\\fancyhead[CO,CE]{\\thepage}
+\\fancyhead[RO,RE]{\\scshape \\today}
+\\renewcommand{\\indexname}{\\vskip -0.25in}
 \\begin{document}
 \\begin{theindex}\n"""
     DOC_ENDSTR = """\\end{theindex}

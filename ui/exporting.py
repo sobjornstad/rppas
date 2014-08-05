@@ -2,14 +2,17 @@
 # Copyright (c) 2014 Soren Bjornstad <contact@sorenbjornstad.com>
 # License: GNU AGPL, version 3 or later; see COPYING for details
 
+import os
 import re
 import subprocess
 import sys
+import tempfile
 
 import db.search
 import db.entries
 from db.utilities import unzero_pad
 from config import NOTEBOOK_TYPES
+import termdisplay
 
 def formatEntries(elist, count):
     """Given a list of entries, format them for export."""
@@ -105,8 +108,30 @@ def printAllEntries():
     DOC_ENDSTR = """\\end{theindex}
 \\end{document}\n"""
 
-    with open('export.txt', 'w') as f:
+    # it would be good to delete the tmpdir we used at some point in the future
+    tdir = tempfile.mkdtemp()
+    oldcwd = os.getcwd()
+    os.chdir(tdir)
+
+    fnamebase = "index"
+    tfile = os.path.join(tdir, '.'.join([fnamebase, 'tex']))
+    with open(tfile, 'w') as f:
         f.write(DOC_STARTSTR)
         f.writelines(entr)
         f.write(DOC_ENDSTR)
-    subprocess.call(['pdflatex', 'export.txt'])
+    r = subprocess.call(['pdflatex', tfile])
+    if r:
+        termdisplay.warn("Error executing latex! Please see the error above.")
+        return
+
+    ofile = os.path.join(tdir, '.'.join([fnamebase, 'pdf']))
+    if sys.platform.startswith('linux'):
+        subprocess.call(["xdg-open", ofile])
+    elif sys.platform == "darwin":
+        os.system("open %s" % ofile)
+    elif sys.platform == "win32":
+        os.startfile(ofile)
+    else:
+        termdisplay.warn("Unable to automatically open the output. Please" \
+                "browse manually to %s." % ofile)
+    os.chdir(oldcwd)

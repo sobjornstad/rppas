@@ -3,6 +3,8 @@
 # License: GNU AGPL, version 3 or later; see COPYING for details
 
 import re
+import subprocess
+
 import db.search
 import db.entries
 from db.utilities import unzero_pad
@@ -53,9 +55,9 @@ def printAllEntries():
     entr = formatEntries(elist)
 
     DOC_STARTSTR = """\\documentclass{article}
-\\usepackage[margin=0.5in]{geometry}
+\\usepackage[margin=0.5in, landscape]{geometry}
 \\usepackage[utf8x]{inputenc}
-\\usepackage[columns=3, indentunit=1.5em, columnsep=2em, font=small, justific=raggedright]{idxlayout}
+\\usepackage[columns=4, indentunit=0.8em, columnsep=1em, font=footnotesize, justific=raggedright, rule=0.5pt]{idxlayout}
 \\begin{document}
 \\begin{theindex}\n"""
     DOC_ENDSTR = """\\end{theindex}
@@ -65,3 +67,4 @@ def printAllEntries():
         f.write(DOC_STARTSTR)
         f.writelines(entr)
         f.write(DOC_ENDSTR)
+    subprocess.call(['pdflatex', 'export.txt'])

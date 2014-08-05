@@ -4,21 +4,29 @@
 
 import re
 import subprocess
+import sys
 
 import db.search
 import db.entries
 from db.utilities import unzero_pad
 from config import NOTEBOOK_TYPES
 
-def formatEntries(elist):
+def formatEntries(elist, count):
     """Given a list of entries, format them for export."""
-    #TODO: Progress bar
 
     ENTRY_STARTSTR = r"\item \textbf{"
     ENTRY_ENDSTR = r"}, "
 
     formatted = []
     e = sorted(elist.values(), key=lambda s: s.lower())
+
+    progress = 0
+    perfifty = 0
+    print "\nFormatting:",
+    print "[                                                 ]",
+    print '\b' * 51,
+    sys.stdout.flush()
+
     for ename in e:
         oList = []
         occs = db.entries.fetch_occurrences(db.entries.get_eid(ename))
@@ -31,6 +39,14 @@ def formatEntries(elist):
         entryStr = munge_latex(entryStr)
         formatted.append(entryStr)
 
+        # progress update
+        progress += 1
+        if float(progress * 50 / count) > perfifty:
+            perfifty = float(progress * 50 / count)
+            sys.stdout.write(".")
+            sys.stdout.flush()
+
+    print "\n"
     return formatted
 
 def munge_latex(s):
@@ -69,8 +85,7 @@ def munge_latex(s):
 
 def printAllEntries():
     count, elist = db.search.Entries('')
-    print "%i entries in database." % count
-    entr = formatEntries(elist)
+    entr = formatEntries(elist, count)
 
     DOC_STARTSTR = """\\documentclass{article}
 \\usepackage[top=0.9in, bottom=0.8in, left=0.5in, right=0.5in, headsep=0in, landscape]{geometry}

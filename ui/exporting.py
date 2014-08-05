@@ -95,12 +95,13 @@ def printAllEntries():
 \\usepackage[utf8x]{inputenc}
 \\usepackage[columns=5, indentunit=0.75em, columnsep=0.5em, font=footnotesize, justific=raggedright, rule=0.5pt]{idxlayout}
 \\usepackage[sc,osf]{mathpazo}
+\\usepackage{lastpage}
 \\usepackage{fancyhdr}
 \\fancyhf{}
 \\pagestyle{fancy}
 \\renewcommand{\\headrulewidth}{0.5pt}
 \\fancyhead[LO,LE]{\\scshape The Complete Records Project Index}
-\\fancyhead[CO,CE]{\\thepage}
+\\fancyhead[CO,CE]{\\thepage\ / \\pageref{LastPage}}
 \\fancyhead[RO,RE]{\\scshape \\today}
 \\renewcommand{\\indexname}{\\vskip -0.25in}
 \\begin{document}
@@ -119,6 +120,7 @@ def printAllEntries():
         f.write(DOC_STARTSTR)
         f.writelines(entr)
         f.write(DOC_ENDSTR)
+    r = subprocess.call(['pdflatex', tfile])
     r = subprocess.call(['pdflatex', tfile])
     if r:
         termdisplay.warn("Error executing latex! Please see the error above.")

@@ -4,6 +4,8 @@ list.
 BUGFIXES
 ========
 
+- Apply en-dashification only to the range part of the index (in print index
+  parser). This shouldn't be terribly difficult with a regex.
 - Don't allow deleting a notebook without deleting its events.
 - Fix duplicate event handling
 - Autosave entries if ^C is pressed at that screen.
@@ -36,6 +38,8 @@ Things that could cause data loss problems, or annoyance
 Other new features
 ------------------
 
+- Create a page at the end of an index printout listing out the dates of each
+  notebook. Also at the beginning or end, maybe the number of entries.
 - Allow the entry of simply "CB6" or so instead of separate type and num entry
 - Don't make ntype entries case-sensitive.
 - Default to non-special events, so you can press Enter for them

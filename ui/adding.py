@@ -2,6 +2,9 @@
 # Copyright (c) 2014 Soren Bjornstad <contact@sorenbjornstad.com>
 # License: GNU AGPL, version 3 or later; see COPYING for details
 
+import readline
+import sys
+
 import db.adding
 import config
 import termdisplay
@@ -20,8 +23,9 @@ def screen():
 
     print "Enter /help for information about adding commands."
     while True:
-        print ""
-        entry = termdisplay.ask_input("Entry:")
+        entry = raw_input(termdisplay.colors.RED+"Entry: "+
+                          termdisplay.colors.YELLOW)
+        print termdisplay.colors.ENDC
 
         if entry == "/help":
             print "Available commands:"

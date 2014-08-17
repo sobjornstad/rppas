@@ -14,6 +14,8 @@ from db.utilities import unzero_pad
 from config import NOTEBOOK_TYPES
 import termdisplay
 
+#TODO: create a db side for this and move the stuff that belongs there over there
+
 def formatEntries(elist, count):
     """Given a list of entries, format them for export."""
 
@@ -58,6 +60,9 @@ def munge_latex(s):
     # ampersands
     s = s.replace('&', '\\&')
 
+    # hash signs
+    s = s.replace('#', '\\#')
+
     # italicize titles &c
     if "__" in s:
         s = re.sub("\\\\textbf{(.*)__(.*)}", "\\\\textbf{\emph{\\1}\\2}", s)
@@ -83,6 +88,7 @@ def munge_latex(s):
             s = s.replace(repl, repl.lower())
 
     # use en-dash in ranges; might grab a few wrong things; maybe worth it
+    #TODO: only do this part on the non-entry side, to make it better
     s = s.replace('-', '--')
     return s
 

@@ -8,6 +8,13 @@ import db.database
 import db.entries
 import db.utilities
 import termdisplay
+tc = termdisplay.colors
+
+def readline_prefiller(text):
+    def hook():
+        readline.insert_text(text)
+        readline.redisplay()
+    return hook
 
 def screen(entry):
     """
@@ -61,8 +68,11 @@ def fix_entry(entry):
     """
 
     print ""
-    # ask if we want to leave a moved ref
-    new_entry = termdisplay.ask_input("Change to:")
+    readline.set_pre_input_hook(readline_prefiller(entry))
+    new_entry = raw_input(tc.RED+"Change to: "+tc.YELLOW)
+    print tc.ENDC
+    readline.set_pre_input_hook()
+
     if db.entries.get_eid(new_entry):
         print "That entry already exists! Try a different one, or use coalesce."
         print "~ Press any key to continue ~",

@@ -74,11 +74,6 @@ def munge_latex(s):
     if '""' in s:
         s = re.sub('\\\\textbf{(.*)""(.*)}', '\\\\textbf{``\\1"\\2}', s)
 
-    # small-capify notebook names
-    for nbuname in NOTEBOOK_TYPES:
-        if nbuname in s:
-            s = re.sub('%s' % nbuname, '{\\\\scshape %s\,}' % nbuname.lower(), s)
-
     # reformat 'see' entries with smallcaps and colons
     for redir in ['see', 'moved to', 'see also', 'also see']:
         if ''.join(['.', redir]) in s:
@@ -91,8 +86,15 @@ def munge_latex(s):
     return s
 
 def endashify(s):
-    """Change hyphens to en-dashes in ranges."""
+    """Formatting that should affect only the occurrence section."""
+    # change hyphens to en-dashes
     s = s.replace('-', '--')
+
+    # small-capify notebook names
+    for nbuname in NOTEBOOK_TYPES:
+        if nbuname in s:
+            s = re.sub('%s' % nbuname, '{\\\\scshape %s\,}' % nbuname.lower(), s)
+
     return s
 
 def printAllEntries():

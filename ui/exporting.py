@@ -28,8 +28,8 @@ def formatEntries(elist, count):
     progress = 0
     perfifty = 0
     print "\nFormatting:",
-    print "[                                                 ]",
-    print '\b' * 51,
+    print "[                                                  ]",
+    print '\b' * 52,
     sys.stdout.flush()
 
     for ename in e:
@@ -39,6 +39,7 @@ def formatEntries(elist, count):
             ntype, nnum, page = occ
             oList.append("%s%s.%s" % (ntype, nnum, unzero_pad(page)))
         occStr = ', '.join(oList)
+        occStr = endashify(occStr)
         entryStr = ''.join([ENTRY_STARTSTR, ename, ENTRY_ENDSTR, occStr])
         entryStr = ''.join([entryStr, '\n'])
         entryStr = munge_latex(entryStr)
@@ -87,8 +88,10 @@ def munge_latex(s):
             repl.replace(": %s", "")
             s = s.replace(repl, repl.lower())
 
-    # use en-dash in ranges; might grab a few wrong things; maybe worth it
-    #TODO: only do this part on the non-entry side, to make it better
+    return s
+
+def endashify(s):
+    """Change hyphens to en-dashes in ranges."""
     s = s.replace('-', '--')
     return s
 

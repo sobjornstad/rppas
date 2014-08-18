@@ -1,5 +1,4 @@
 The Records Project Paper Augmentation System (RPPAS)
-Version 0.1.0
 
 == Dependencies ==
 Required to use the program:
@@ -10,6 +9,11 @@ To use the "print index" feature, you will need:
 - A working copy of LaTeX.
 - The following packages: utf8x, geometry, idxlayout, mathpazo, lastpage,
   fancyhdr.
+
+GNU Readline will make the program easier to use if support is compiled into
+your Python binary, which is usually the case on Linux. Lacking it shouldn't
+prevent the program from working, although I haven't tried it on any systems
+without it to confirm that.
 
 == Installing ==
 Nothing needs to be installed as long as you have Python and sqlite3. You do

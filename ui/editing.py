@@ -2,6 +2,7 @@
 # Copyright (c) 2014 Soren Bjornstad <contact@sorenbjornstad.com>
 # License: GNU AGPL, version 3 or later; see COPYING for details
 
+import readline
 from time import sleep
 import db.database
 import db.entries

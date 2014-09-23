@@ -10,6 +10,8 @@ import tempfile
 
 import search
 import entries
+import notebooks
+import events
 from utilities import unzero_pad
 from config import NOTEBOOK_TYPES
 import ui.termdisplay
@@ -53,7 +55,7 @@ def formatEntries(elist, count):
     print "\n"
     return formatted
 
-def munge_latex(s):
+def munge_latex(s, for_events=False):
     "Escape characters reserved by LaTeX and format Markdown-like."
 
     # ampersands
@@ -62,11 +64,17 @@ def munge_latex(s):
     # hash signs
     s = s.replace('#', '\\#')
 
+    # are we doing it for the index? if so, stop early
+    if for_events:
+        # handle the underscore early, since we're not doing title handling
+        s = s.replace('_', '\\textunderscore ')
+        return s
+
     # italicize titles &c
     if "__" in s:
         s = re.sub("\\\\textbf{(.*)__(.*)}", "\\\\textbf{\emph{\\1}\\2}", s)
     # we could have typoes or other uses that result in single underscores
-    s = s.replace('_', '\\textunderscore')
+    s = s.replace('_', '\\textunderscore ')
 
     # move opening quote to start of line
     if '""' in s:
@@ -95,13 +103,49 @@ def endashify(s):
 
     return s
 
+def getEvents():
+    nbooks = notebooks.dump()
+    strs = []
+    for n in nbooks:
+        ntype, nnum, dopened, dclosed = n
+        if ntype != 'CB':
+            # no events in other books
+            continue
+        nid = notebooks.get_nid(ntype, nnum)
+        evs, specials = events.fetch_in_notebook(nid)
+
+        content = ""
+        for i in evs:
+            content += "\\item %s\n" % i.getText()
+        content = munge_latex(content, for_events=True)
+        evsstring = """\\section*{\\textsc{%s}\\thinspace%s}
+\\begin{center}%s -- %s\\end{center}\\smallskip
+
+\\noindent \\textsc{Events:}{\\footnotesize \\begin{itemize}\\itemsep 0pt
+%s\\end{itemize}\n\n\\bigskip}""" % (ntype, nnum, dopened, dclosed, content)
+
+        content = ""
+        for i in specials:
+            content += "\\item %s\n" % i.getText()
+        content = munge_latex(content, for_events=True)
+        specialsstring = """\\noindent \\textsc{Specials:}
+{\\footnotesize \\begin{itemize}\\itemsep 0pt
+%s\\end{itemize}\n\n}""" % (content)
+
+        strs.append(evsstring)
+        strs.append(specialsstring)
+    return ''.join(strs)
+
+
 def printAllEntries():
     count, elist = search.Entries('')
     entr = formatEntries(elist, count)
+    evnts = getEvents()
 
     DOC_STARTSTR = """\\documentclass{article}
 \\usepackage[top=0.9in, bottom=0.8in, left=0.5in, right=0.5in, headsep=0in, landscape]{geometry}
 \\usepackage[utf8x]{inputenc}
+\\usepackage{multicol}
 \\usepackage[columns=5, indentunit=0.75em, columnsep=0.5em, font=footnotesize, justific=raggedright, rule=0.5pt]{idxlayout}
 \\usepackage[sc,osf]{mathpazo}
 \\usepackage{lastpage}
@@ -112,10 +156,17 @@ def printAllEntries():
 \\fancyhead[LO,LE]{\\scshape The Complete Records Project Index}
 \\fancyhead[CO,CE]{\\thepage\ / \\pageref{LastPage}}
 \\fancyhead[RO,RE]{\\scshape \\today}
-\\renewcommand{\\indexname}{\\vskip -0.25in}
+\\renewcommand{\\indexname}{\\vskip -0.55in}
+\\usepackage{titlesec}
 \\begin{document}
 \\begin{theindex}\n"""
-    DOC_ENDSTR = """\\end{theindex}
+
+    INDEX_ENDSTR = """\\end{theindex}\n
+\clearpage
+\\titleformat{\section}
+  {\\normalfont\\Large\\bfseries}{\\thesection}{1em}{}[{\\titlerule[0.5pt]}]
+\\begin{multicols}{5}\n"""
+    DOC_ENDSTR = """\\end{multicols}
 \\end{document}\n"""
 
     # it would be good to delete the tmpdir we used at some point in the future
@@ -128,6 +179,8 @@ def printAllEntries():
     with open(tfile, 'w') as f:
         f.write(DOC_STARTSTR)
         f.writelines(entr)
+        f.write(INDEX_ENDSTR)
+        f.write(evnts)
         f.write(DOC_ENDSTR)
     r = subprocess.call(['pdflatex', tfile])
     r = subprocess.call(['pdflatex', tfile])

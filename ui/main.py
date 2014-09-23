@@ -38,8 +38,8 @@ def screen():
         elif c == 'a':
             adding.screen()
         elif c == 'p':
-            import exporting
-            exporting.printAllEntries()
+            from db.exporting import printAllEntries
+            printAllEntries()
         elif c == 'i':
             print ""
             f = termdisplay.ask_input("Filename:")

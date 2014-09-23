@@ -8,13 +8,11 @@ import subprocess
 import sys
 import tempfile
 
-import db.search
-import db.entries
-from db.utilities import unzero_pad
+import search
+import entries
+from utilities import unzero_pad
 from config import NOTEBOOK_TYPES
-import termdisplay
-
-#TODO: create a db side for this and move the stuff that belongs there over there
+import ui.termdisplay
 
 def formatEntries(elist, count):
     """Given a list of entries, format them for export."""
@@ -34,7 +32,7 @@ def formatEntries(elist, count):
 
     for ename in e:
         oList = []
-        occs = db.entries.fetch_occurrences(db.entries.get_eid(ename))
+        occs = entries.fetch_occurrences(entries.get_eid(ename))
         for occ in occs:
             ntype, nnum, page = occ
             oList.append("%s%s.%s" % (ntype, nnum, unzero_pad(page)))
@@ -98,7 +96,7 @@ def endashify(s):
     return s
 
 def printAllEntries():
-    count, elist = db.search.Entries('')
+    count, elist = search.Entries('')
     entr = formatEntries(elist, count)
 
     DOC_STARTSTR = """\\documentclass{article}

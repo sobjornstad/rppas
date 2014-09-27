@@ -64,10 +64,11 @@ def munge_latex(s, for_events=False):
     # hash signs
     s = s.replace('#', '\\#')
 
-    # are we doing it for the index? if so, stop early
+    # are we doing it for the index? if so, handle italics and stop
     if for_events:
-        # handle the underscore early, since we're not doing title handling
+        s = re.sub("_(.*)_(.*)", "\\emph{\\1}\\2", s)
         s = s.replace('_', '\\textunderscore ')
+
         return s
 
     # italicize titles &c
@@ -118,7 +119,7 @@ def getEvents():
         for i in evs:
             content += "\\item %s\n" % i.getText()
         content = munge_latex(content, for_events=True)
-        evsstring = """\\section*{\\textsc{%s}\\thinspace%s}
+        evsstring = """\\raggedright\\section*{\\textsc{%s}\\thinspace%s}
 \\begin{center}%s -- %s\\end{center}\\smallskip
 
 \\noindent \\textsc{Events:}{\\footnotesize \\begin{itemize}\\itemsep 0pt

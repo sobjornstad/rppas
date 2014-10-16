@@ -123,7 +123,6 @@ def processPages(page, ntype):
         return finishedPages
     else:
         # single entry
-        #TODO: zero-pad ranges
         page = utilities.zero_pad(page, ntype)
         return [page]
 

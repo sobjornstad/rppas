@@ -111,14 +111,31 @@ def zero_pad(i, ntype):
             i = '00' + i
         else:
             termdisplay.warn("Your notebooks are very large. Unable to correctly pad page numbers with leading zeroes.")
+    elif '-' in i:
+        vals = i.split('-')
+        if len(vals) != 2:
+            termdisplay.warn("That doesn't look like a valid range. I'll enter it anyway – but have a look.")
+            return i
+        vals[0] = zero_pad(vals[0], ntype)
+        vals[1] = zero_pad(vals[1], ntype)
+        i = '-'.join(vals)
 
     return i
 
 def unzero_pad(s):
     """
     Remove any leading zeroes from the argument string and return modified
-    string. Dead simple.
+    string.
     """
+
+    # if a range, strip each element separately
+    if '-' in s:
+        vals = s.split('-')
+        if len(vals) != 2:
+            # funky range or misdetected - just fall back to a simpler version
+            return s.lstrip('0')
+        vals = vals[0].lstrip('0'), vals[1].lstrip('0')
+        s = '-'.join(vals)
 
     return s.lstrip('0')
 

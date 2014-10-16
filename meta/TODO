@@ -27,7 +27,6 @@ Things that could cause data loss problems, or annoyance
 --------------------------------------------------------
 
 - Prevent use of "abbreviated" ranges like "25-6"
-- Automatically put leading 0's in ranges
 - Allow some keystroke (^C? Esc?) to cancel an active search/whatever.
 - Implement validation of page numbers when adding entries
 - Similarly, don't allow blank entries or page numbers

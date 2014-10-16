@@ -4,8 +4,6 @@ list.
 BUGFIXES
 ========
 
-- Apply en-dashification only to the range part of the index (in print index
-  parser). This shouldn't be terribly difficult with a regex.
 - Don't allow deleting a notebook without deleting its events.
 - Fix duplicate event handling
 - Autosave entries if ^C is pressed at that screen.
@@ -13,7 +11,6 @@ BUGFIXES
 - Filters are not cleared on leaving the search screen and can come back to
   haunt future searches. (Hmm, they appeared to last time I checked...do I mean
   that they come back if you press filter again?)
-- /strike doesn't seem to need the '/' to work?
 
 INTERNAL WORK
 =============
@@ -50,19 +47,15 @@ Other new features
 - Start a search from the add screen
 
 - Allow when_was queries to work on TBs
-- Printing list/exporting.
 - Have some way for /strike to undo all of the things added in one go with
   commas, rather than just one.
 - search_entries(): Allow a "starts with" search, like the STO directory, for
   things like "UI" and "IT" that are often substrings. Maybe a case-sensitive
   option too? Regexes?
+- Allow some sort of backwards searching (give location, find entries).
 
 - See if I can get readline?
-    - If readline works (and maybe even if it doesn't), repeat the above entry
-      (and maybe with it back one level of ,'s)
     - Also if readline works, editing of events
-    - Also, a /strike command that only knocks out the page? If we get a
-      readline(), we can do all sorts of better things here
 
 - Filter index by date; add an option to the events screen to pull up index for
   that set of dates

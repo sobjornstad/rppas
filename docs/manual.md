@@ -7,7 +7,7 @@ notebooks. It is specifically designed for the way I use my notebooks, but might
 be useful to others either to use directly or as a starting point for
 customization to meet their own requirements.
 
-This is the manual for version 0.1.0.
+This is the manual for version 0.2.0.
 
 While the RPPAS itself is licensed under the GPL, this manual is under *no
 copyright* and may be used in any way for any purpose whatsoever without the
@@ -39,7 +39,7 @@ The main functions of the RPPAS are built around an index, which stores
 *notebook types*, *notebook numbers*, and *page numbers* along with *entries* or
 keys. For example:
 
-    RPPAS, CB16.57
+    RPPAS: CB16.57
 
 You can add entries, search for them, edit them, delete them, and combine them.
 Each entry can have several occurrences -- you might want to mention the RPPAS
@@ -50,8 +50,9 @@ different page number, they will be combined.
 You can also store the dates during which you have used each notebook and, for
 journals, keep track of events that occurred during those dates.
 
-There is also a way to import from CSV, and a similar export feature (for
-printing the index or doing anything else with it) is planned.
+There is also a way to import from CSV, and a similar export feature is
+planned. Finally, if you have LaTeX and the necessary packages installed on
+your system, you can print out a nicely formatted paper version of your index.
 
 Setup and running
 =================
@@ -237,46 +238,47 @@ is handled by SQLite and I don't want to try to figure out how to change the
 sort there. So for now I use the workaround and hopefully this will be better in
 the indeterminate future.
 
+The “print index” feature (mentioned later) recognizes this syntax and will
+italicize entries ending in double underscores and move the first quote to the
+beginning of entries containing a double quote.
+
 After entering an entry, you'll be prompted for a *page*. You can technically
 put anything in the page field, but for best results, the following options are
 recommended:
 
-- A reference to another entry: **see FOO**
+- A reference to another entry: **see OTHER ENTRY**
 - A single page number: **34**
-- A series of page numbers: **34, 55, 171**
-- A range: **34-36**
-
-If you enter a range and one or both of the pages is fewer digits than the
-maximum number of digits that is possible for that notebook type (for instance,
-in a notebook type with 80 pages, just one digit, or in a notebook type with 240
-pages, one or two digits), in order to ensure you can search for and sort the
-range as effectively as possible, you need to make sure to pad them with leading
-zeroes. For instance, in an 80-page notebook, **5-10** becomes **05-10**, and in
-a 240-page notebook, **50-71** becomes **050-071**. You don't have to worry
-about this when entering single pages or comma-separated page numbers; the
-software will take care of it automatically.
+- A series of page numbers: **34, 55, 171** (use commas to separate)
+- A range: **34-36** (use a hyphen to separate)
 
 When you press Enter, RPPAS will place that entry into the *queue* along with
-the page number needed to create occurrences later, then prompt you for another
-entry. (If you enter multiple page numbers, RPPAS will automatically create
-multiple occurrences and place all of them in the queue.) You can keep typing as
-many entries as you want; RPPAS will automatically save the queue in the
-background after it reaches five entries, so that you don't lose any data in the
-event of a power failure or crash. You can view the contents of the queue with
-the adding command */queue*; see the following section.
+the page number needed, then prompt you for another entry. (If you enter
+multiple page numbers, RPPAS will automatically create multiple occurrences and
+place all of them in the queue.) You can keep typing as many entries as you
+want; RPPAS will automatically save the contents of the queue in the background
+whenever it reaches five entries, so that you don't lose any data in the event
+of a power failure or crash. You can view the contents of the queue with the
+adding command */queue*; see the following section.
 
 If you specify an entry that already exists in the database, RPPAS will add the
 page and notebook numbers you provided to that entry (in technical terms, it
 will add new occurrences to the existing entry). If you enter exactly the same
 entry *and* the same page number, RPPAS will silently ignore your entry.
 
+If *readline(3)* support is compiled into your version of Python, readline
+will be used for entries, which means you can use the arrows to move around and
+recall recent entries, as well as any other readline commands. Unfortunately,
+readline support is usually only compiled into Python on Linux systems; on
+other systems, you will probably be unable to correct entries without
+backspacing everything you’ve typed since then.
+
 
 Adding commands
 ---------------
-Instead of an entry, you can also type an *adding command*. Adding commands
-begin with a slash (/) and are accepted anywhere you are prompted for an entry
-(but not when prompted for a page -- then it will cheerfully enter the adding
-command as the page number of the previous entry).
+Instead of an entry, you can type an *adding command*. Adding commands begin
+with a slash (/) and are accepted anywhere you are prompted for an entry (but
+not when prompted for a page -- if you do that, it will cheerfully enter the
+adding command as the page number of the previous entry).
 
 Valid adding commands:
 
@@ -288,8 +290,8 @@ Valid adding commands:
 - **/save**: Immediately save the contents of the queue to disk, rather than
   waiting for an automatic save.
 - **/history**: Show a list of all the entries you've added this session, along
-  with anything still in the queue. Be careful, as this might be very large if
-  you've added many things this session.
+  with anything still in the queue. This could be very large if you've added
+  many things this session.
 - **/strike**: Delete the last entry (if you made a typo or other mistake). You
   can optionally /strike multiple entries at once by providing the number of
   added entries to remove, e.g., */strike 3*. If the entry(ies) have left the
@@ -305,7 +307,7 @@ Once you've created some notebooks and added some entries to them, the real fun
 begins with searching through the entries. You can open the search screen by
 pressing 's' on the main screen.
 
-The search searches substrings, so "foo," "bar," "foobar," or even "oob" would
+The search matches substrings, so "foo," "bar," "foobar," or even "oob" would
 match the entry "foobar". Searches are not case-sensitive.
 
 Once you've entered a search, you'll be shown a list of all matching entries,
@@ -431,8 +433,7 @@ the entry's reference number. There are three options:
   worded index entries in different notebooks that really refer to exactly the
   same thing.
 - **Delete entry**: Deletes the entry and all of its occurrences. This cannot be
-  undone (except by restoring a backup). This should rarely be needed, but is
-  provided for completeness.
+  undone.
 
 
 Importing
@@ -458,3 +459,27 @@ indexes, this doesn't have entries and occurrences in quite the same way that
 RPPAS has. It can handle multiple occurrences within the same notebook on the
 same line, but if there are occurrences across several notebooks, each notebook
 needs to be on a new line with the same entry value.
+
+Printing an index
+=================
+
+Being able to search things on the computer is nice, but sometimes it’s also
+nice to have a paper copy. Even if you never actually print it out, sometimes you might want to scan your index to look back on what you’ve been writing or to proof it, and a PDF copy would be much nicer than scrolling through a long list of search results. For this reason, RPPAS provides the **print index** option.
+
+In order to use the print index feature, you need to have LaTeX installed on your system along with the following packages: *utf8x*, *geometry*, *idxlayout*, *mathpazo*, *lastpage*, *fancyhdr*. The program expects `pdflatex` to be on your system path; if it’s easier to do so than to put it on your path, you can modify this in `db/exporting.py` (search for `subprocess.call` and make sure to change both occurrences of the call command).
+
+When that is in place, there’s not too much more to say about the feature; you just choose 'p' from the main screen and RPPAS generates a PDF, saves it in a temporary location, and opens it in your PDF viewer.
+
+Support and development
+=======================
+
+If you have questions or suggestions, you may email me at
+contact@sorenbjornstad.com.
+
+This software is customized to precisely my needs and I am not aiming to make
+the software as generally useful as possible, so I am not likely to change
+features only to make it easier for you to use, but suggestions and bug reports
+are still welcome. I’m also unlikely to accept pull requests for this reason
+(unless I’ve agreed to it beforehand), but if you’ve added something cool, this
+is not trying to discourage you from letting me know and seeing if I might want
+it.

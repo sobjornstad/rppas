@@ -34,12 +34,9 @@ Things that could cause data loss problems, or annoyance
 Other new features
 ------------------
 
-- Create a page at the end of an index printout listing out the dates of each
-  notebook. Also at the beginning or end, maybe the number of entries.
 - Allow the entry of simply "CB6" or so instead of separate type and num entry
 - Don't make ntype entries case-sensitive.
 - Default to non-special events, so you can press Enter for them
-- Autocreate notebook if adding and it doesn't exist?
 
 - Delete an individual occurrence (goes in edit entries menu)
 - Start an add from the edit screen
@@ -62,6 +59,8 @@ Other new features
       particular
         - And some sort of scrolling for the events screen
 
-- Allow inserting when modifying event lists, not just swapping.
+- Allow inserting when modifying event lists, not just swapping. In fact,
+  *just* inserting would be a much superior mode, and there should seldom be
+  cause for swapping.
 - Allow multiple fields in a line and tab between them, for Where was's and
   stuff.

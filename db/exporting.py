@@ -35,15 +35,11 @@ def formatEntries(elist, count):
     for ename in e:
         oList = []
         occs = entries.fetch_occurrences(entries.get_eid(ename))
-        for occ in occs:
-            ntype, nnum, page = occ
-            oList.append("%s%s.%s" % (ntype, nnum, unzero_pad(page)))
+        oList = ["%s%s.%s" % (occ[0], occ[1], unzero_pad(occ[2])) for occ in occs]
         occStr = ', '.join(oList)
         occStr = endashify(occStr)
-        entryStr = ''.join([ENTRY_STARTSTR, ename, ENTRY_ENDSTR, occStr])
-        entryStr = ''.join([entryStr, '\n'])
-        entryStr = munge_latex(entryStr)
-        formatted.append(entryStr)
+        entryStr = ''.join([ENTRY_STARTSTR, ename, ENTRY_ENDSTR, occStr, '\n'])
+        formatted.append(munge_latex(entryStr))
 
         # progress update
         progress += 1

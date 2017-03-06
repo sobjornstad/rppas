@@ -1,4 +1,17 @@
-The Records Project Paper Augmentation System (RPPAS)
+The Records Project Paper Augmentation System (RPPAS) is deprecated and will
+not be receiving any future updates. Tabularium
+(http://github.com/sobjornstad/tabularium) has the same purpose, contains
+much of the same code, and has many more features. If by chance you have been
+using RPPAS and need your database upgraded, please drop me a line
+(contact@sorenbjornstad.com), as I don't have an automated upgrade procedure.
+
+The original README remains below for reference, and this repository will be
+kept up for some months.
+
+
+---------------------------------------------------------------------------
+
+
 
 == Dependencies ==
 Required to use the program:
